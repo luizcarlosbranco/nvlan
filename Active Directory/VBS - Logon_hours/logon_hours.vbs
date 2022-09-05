@@ -102,7 +102,7 @@ Else
 		Next
 	Next
 	wscript.echo ""
-	'Vamos dar alerta se na proxima hora vai acabar o horario de logon OU bloquear se já acabou o tempo
+	'Vamos informar qual seria o resultado desse script
 	If Schedule(Now_Weekday,Now_Hour_UTC) = 0 Then
 		wscript.echo "Resultado: O Script iria BLOQUEAR o PC agora"
 	ElseIf Schedule(Now_Weekday,NextHour_UTC_Hour) = 0 Then
