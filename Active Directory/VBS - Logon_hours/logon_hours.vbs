@@ -7,7 +7,6 @@ Set objSysInfo = CreateObject("ADSystemInfo")
 xcount = 0
 While xcount < 5
 	Set objUser = GetObject("LDAP://" & objSysInfo.UserName)
-	'Set objUser = GetObject ("LDAP://CN=Marcia Yukie Kamada Minervini,OU=GGP,OU=DIEX,OU=.CNT,DC=cnt,DC=org,DC=br")
 	If IsNull(objUser) or IsEmpty(objUser) Then
 		xcount = xcount+1
 		If (xcount = 5) Then
