@@ -1,0 +1,1 @@
+Get-ADUser who -Properties | select badPwdCount, LastBadPasswordAttempt
