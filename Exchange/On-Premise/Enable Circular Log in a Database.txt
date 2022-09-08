@@ -1,0 +1,6 @@
+#change this database_name
+$database = "database_name"
+#------------------------------------------------------------
+Set-MailboxDatabase $database -CircularLoggingEnabled $True
+Dismount-Database -Identity $database
+Mount-Database -Identity $database

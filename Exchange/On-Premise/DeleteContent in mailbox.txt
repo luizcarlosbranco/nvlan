@@ -1,0 +1,8 @@
+#Delete EVERYTHING
+Search-MailBox -Identity "recipient" -DeleteContent -force
+
+
+#Search and delete something
+Get-MailBox -ResultSize unlimited -Identity "recipient@yourdomain.com" > | Search-Mailbox -SearchQuery 'Subject:"Something..." and Body:"*Body*" and  From:"who@where.com" and Sender:"who@where.com" and Attachment:"report.xlsx"' -DeleteContent -force 
+#or
+Get-MailBox -ResultSize unlimited -Identity "recipient" | Search-Mailbox -SearchQuery 'Attachment:"virus.doc"' -DeleteContent -force

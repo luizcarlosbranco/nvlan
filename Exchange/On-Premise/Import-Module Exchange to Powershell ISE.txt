@@ -1,0 +1,5 @@
+Add-PSSnapin Microsoft.Exchange.Management.PowerShell.SnapIn
+
+#Or Import commands from the exchange server
+$yourserver = your_exchange.yourdomain.com
+Import-PSSession (New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri http://$yourserver/PowerShell/ -Authentication Kerberos)

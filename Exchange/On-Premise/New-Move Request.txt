@@ -1,0 +1,15 @@
+#to check who is in a specific database
+Get-MailboxDatabase -Identity database_name | Get-Mailbox
+Get-MailboxDatabase -Identity database_name | Get-Mailbox | select DisplayName, totalitemsize, alias
+Get-MailboxDatabase -Identity database_name | Get-Mailbox | Get-MailboxStatistics | select DisplayName, totalitemsize, alias
+
+#doing a move
+New-MoveRequest -Identity 'who' -TargetDatabase "NEW_DATABASE"
+#or
+New-MoveRequest -Identity 'who' -TargetDatabase "NEW_DATABASE" -BatchName 'who' -BadItemLimit "200"
+
+#Check the move requests
+Get-MoveRequest -MoveStatus Inprogress | Get-MoveRequestStatistics | ft Alias, TotalMailboxSize, sourcedatabase, StatusDetail, PercentComplete, targetdatabase
+
+#Cancel a move
+Remove-MoveRequest -Identity 'who'

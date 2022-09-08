@@ -1,0 +1,1 @@
+New-MailContact -Name "NAME" -FirstName "FIRST" -Lastname "LAST" -ExternalEmailAddress "email@address.com.br" -OrganizationalUnit "yourdomain.com/Exchange_OU/"

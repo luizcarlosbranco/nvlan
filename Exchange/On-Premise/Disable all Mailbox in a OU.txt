@@ -1,0 +1,1 @@
+Get-Mailbox -OrganizationalUnit "OU=Your_OU,DC=your_domain,DC=com" | Disable-Mailbox

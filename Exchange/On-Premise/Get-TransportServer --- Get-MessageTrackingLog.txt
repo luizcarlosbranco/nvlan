@@ -1,0 +1,1 @@
+Get-TransportServer | Get-MessageTrackingLog -MessageId "201906061123190.713685001559830999@pmta11" | Select *

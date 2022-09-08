@@ -1,0 +1,1 @@
+Get-MessageTrackingLog -ResultSize Unlimited -Start "2/10/2016 8:00AM" -End "2/12/2016 5:00PM" -EventId "Send" | Where-Object {$_.Recipients -like "*@senderdomain.com"} | ft -auto timestamp, sender, recipients 

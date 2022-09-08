@@ -1,0 +1,7 @@
+$FTE = Get-DynamicDistributionGroup "group_name"
+
+Get-Recipient -RecipientPreviewFilter $FTE.RecipientFilter | Select name, primarysmtpaddress | Out-GridView
+
+
+
+

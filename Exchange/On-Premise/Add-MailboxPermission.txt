@@ -1,0 +1,4 @@
+
+Add-MailboxPermission -Identity Shared_mailbox -User your_user -AccessRights FullAccess -InheritanceType All
+
+get-user -identity Shared_mailbox | Add-ADPermission -User your_user -ExtendedRights Send-As

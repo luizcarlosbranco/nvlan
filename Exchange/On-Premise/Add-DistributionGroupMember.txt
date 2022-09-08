@@ -1,0 +1,1 @@
+Add-DistributionGroupMember -Identity "Group@your_domain.com" -Member "User"

@@ -1,0 +1,1 @@
+Get-Mailbox -OrganizationalUnit "your_domain.com/Your_OU" -ResultSize Unlimited | Set-CASMailbox -MAPIBlockOutlookRpcHttp:$true

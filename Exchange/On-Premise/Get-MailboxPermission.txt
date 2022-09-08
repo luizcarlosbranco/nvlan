@@ -1,0 +1,8 @@
+#Checking which mailbox the users have full acess
+Get-Mailbox | Get-MailboxPermission | where { ($_.AccessRights -eq "FullAccess") -and ($_.IsInherited -eq $false) -and -not ($_.User -like "NT AUTHORITY\SELF") } | ft @{Name="Identity";expression={($_.Identity -split "/")[-1]}}, User -AutoSize
+
+#Checking which mailbox a SPECIFIC USER have full acess
+Get-Mailbox -OrganizationalUnit "sestsenat.org.br/.DEX" | Get-MailboxPermission -User "yourdomain\who" | where { ($_.AccessRights -eq "FullAccess") -and ($_.IsInherited -eq $false) -and -not ($_.User -like "NT AUTHORITY\SELF") } | ft @{Name="Identity";expression={($_.Identity -split "/")[-1]}}, User -AutoSize
+
+#Checking which mailbox of a SPECIFIC OU the users have full acess
+Get-Mailbox -OrganizationalUnit "yourdomain.com/your_OU" | Get-MailboxPermission | where { ($_.AccessRights -eq "FullAccess") -and ($_.IsInherited -eq $false) -and -not ($_.User -like "NT AUTHORITY\SELF") } | ft @{Name="Identity";expression={($_.Identity -split "/")[-1]}}, User -AutoSize

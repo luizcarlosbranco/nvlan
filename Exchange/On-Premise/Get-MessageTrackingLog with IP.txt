@@ -1,0 +1,1 @@
+Get-TransportService | Get-MessageTrackingLog -Start "8/27/2019" -Sender "sender@yourdomain.com" -Recipients "recipient@yourdomain.com" -ResultSize unlimited | Select-Object eventid,sender,timestamp,OriginalClientIp,connectorid,@{Name="Recipients";Expression={$_.recipients}},messagesubject | Out-GridView

@@ -1,0 +1,6 @@
+#Search all recieved E-mails of a Mailbox in a period of time
+
+Get-MessageTrackingLog -ResultSize Unlimited -Start "4/14/2016 8:00AM" -End "4/14/2016 12:00PM" -Eventid "Receive" -messagesubject "test message" -recipients recipient@yourdomain.com | ft EventId,Source,Timestamp,Sender,Recipients,MessageSubject
+
+
+

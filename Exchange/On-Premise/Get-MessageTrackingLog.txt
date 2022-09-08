@@ -1,0 +1,3 @@
+(Consulta uma caixa de correio em um periodo e retorna somente os itens enviados com o EventID Sender)
+
+Get-MessageTrackingLog -ResultSize Unlimited -Start "3/28/2015 8:00AM" -End "3/28/2015 5:00PM" -EventId "Send" -Sender "sender@yourdomain.com"

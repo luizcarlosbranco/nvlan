@@ -1,0 +1,5 @@
+New-DynamicDistributionGroup -Name "group_name@yourdomain.com" -alias "group_name" -OrganizationalUnit "yourdomain.com/Exchange_OU" -RecipientFilter {((((RecipientType -eq 'UserMailbox') -and (State -eq 'Orlando'))) -and (-not(Name -like 'SystemMailbox{*')) -and (-not(Name -like 'CAS_{*')))} -RecipientContainer "yourdomain.com/your_OU" 
+
+New-DynamicDistributionGroup -Name "Group Name" -Alias "group_name" -OrganizationalUnit "yourdomain.com/Exchange_OU" -RecipientFilter {(RecipientType -eq 'UserMailbox') -and (StateorProvince -eq 'WS' -and Department -eq 'DIRECTOR')} –RecipientContainer "yourdomain.com/your_OU"
+
+New-DynamicDistributionGroup -Name "Group Name" -Alias "group_name" -OrganizationalUnit "yourdomain.com/Exchange_OU/Grupos de Distribuicao" -RecipientContainer "yourdomain.com/your_OU"

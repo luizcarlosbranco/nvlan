@@ -1,0 +1,1 @@
+Get-DistributionGroup "Group_Name" | Get-DistributionGroupMember | ft name, primarysmtpaddress

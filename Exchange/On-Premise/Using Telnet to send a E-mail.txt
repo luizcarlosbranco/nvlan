@@ -1,0 +1,10 @@
+helo yourserver.yourdomain.com
+mail from:sender@yourdomain.com
+rcpt to:recipient@yourdomain.com
+data
+subject:test message
+asdasdasd
+asdasdas
+asdas
+.
+quit

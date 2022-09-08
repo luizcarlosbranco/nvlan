@@ -1,0 +1,1 @@
+Get-MailboxAutoReplyConfiguration -Identity 'who'

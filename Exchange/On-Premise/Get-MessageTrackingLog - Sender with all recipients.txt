@@ -1,0 +1,1 @@
+Get-MessageTrackingLog -ResultSize Unlimited -Start "2/01/2017 01:00AM" -End "3/20/2017 23:00PM" -EventId "Send" -Sender "who@yourdomain.com" | Select-Object timestamp, sender, messagesubject, @{label="recipients";expression={[string]::join(",",$_.recipients)}} | sort timestamp | ft -auto | Out-String -Width 4096 > c:\temp\sent.xls

@@ -1,0 +1,1 @@
+Enable-Mailbox -Identity <USER> -Database <DATABASE_NAME>

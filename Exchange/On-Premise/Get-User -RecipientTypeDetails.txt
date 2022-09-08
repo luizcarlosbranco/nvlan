@@ -1,0 +1,42 @@
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')} | Ft Name, Office, Title
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Ne 'Director') -Or ($_.Title -Ne 'Manager') -Or ($_.Title -Like 'A*') -Or ($_.Title -Like 'S*')}| Ft Name, Office, Title
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator')} | Ft Name, Office, Title
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Eq 'Director') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')} | Ft Name, Office, Title | Out-File C:\TEMP\Report.csv -Width 
+
+*********************************************************************************************************************************************************************************
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator')} | Ft Name, Office, Title
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')} | Ft Name, Office, Title
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')} | Get-MailboxStatistics
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Eq 'Director') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')} | Get-MailboxStatistics
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Eq 'Director') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')} | Get-Mailbox | Ft Name, Database
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Eq 'Director') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')}| Get-Mailbox | Ft Name, Database, $_.Title
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Eq 'Director') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')}| Get-Mailbox | Ft Name, Database,&$_.Title
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Eq 'Director') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')} | Ft Name, Office, Title
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Eq 'Director') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')} | Ft Name, Title
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Eq 'Director') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')} | Get-MailboxStatistics | Ft Name, LastLogonTime
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Eq 'Director') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')}| Get-MailboxStatistics | Ft DisplayName, LastLogonTime
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Eq 'Director') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')}| Ft Name, Office, Title | Out-File C:\TEMP\Report.csv -Width 500
+
+Get-User -RecipientTypeDetails 'UserMailbox' -ResultSize Unlimited -OrganizationalUnit yourdomain.com/your_OU | where { ($_.Title -Eq 'Director') -Or ($_.Title -Eq 'Manager') -Or ($_.Title -Like 'Coordinator*')} | Get-MailboxStatistics | Add-Member -MemberType criptProperty -Name TotalItemSizeinKB -Value {$this.totalitemsize.value.ToKB()} -PassThru | Format-Table DisplayName,TotalItemSizeinKB
+
+
+
+
+
+
+

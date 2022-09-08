@@ -1,0 +1,24 @@
+New-MailboxExportRequest user_name -FilePath \\computer_name\shared_folder\user.pst
+
+#More specific
+
+New-MailboxExportRequest user_name -ContentFilter {(Received -lt "12/20/2017") -and (Sent -lt "12/20/2018")} -FilePath "\\computer_name\shared_folder\user.pst"
+
+
+<EXPORTAR E-MAILS DE UMA MAILBOX PARA UM ARQUIVO .PST>
+
+New-MailboxExportRequest -Mailbox user_name -FilePath "\\computer_name\shared_folder\user.pst"
+
+
+<EXPORTAR E-MAILS DE UMA MAILBOX PARA UM ARQUIVO .PST COM FILTRO DE DATA>
+
+New-MailboxExportRequest user_name -ContentFilter {(Received -lt "01/01/2015") -and (Sent -lt "01/01/2015")} -FilePath "\\computer_name\shared_folder\user.pst"
+
+
+<EXPORTAR E-MAILS PARA UM ARQUIVO .PST E RETORNAR MENSAGENS ENVIADAS QUE TENHAM DESTINATÁRIOS NOS CAMPO PARA, CC OU CCO.>
+
+New-MailboxExportRequest user_name -ContentFilter {(Participants -eq 'sender@yourdomain.com')} -FilePath "\\computer_name\shared_folder\user.pst"
+
+
+
+

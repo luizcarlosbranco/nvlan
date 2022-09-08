@@ -1,0 +1,5 @@
+Disable-Mailbox -Identity "who" -Confirm:$false
+
+#If you have a list of emails to disable, use this:
+$Mailboxes = Get-Content "C:\Temp\emails.txt" | foreach-object {Disable-Mailbox -Identity $_ -Confirm:$false}
+

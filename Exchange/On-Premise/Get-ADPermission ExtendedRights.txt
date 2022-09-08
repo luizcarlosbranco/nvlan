@@ -1,0 +1,1 @@
+Get-ADPermission -Identity who@yourdomain.com | where {$_.ExtendedRights -like 'Send*'} | Ft -Auto User,Deny,ExtendedRights
