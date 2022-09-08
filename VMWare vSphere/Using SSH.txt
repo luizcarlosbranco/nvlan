@@ -1,0 +1,8 @@
+#To acesse, use:
+putty.exe -ssh root@HOST -pw "your_password"
+
+#To copy a file, use:
+pscp.exe -pw "your_password" C:\Temp\vmware\script.ps1 root@HOST:/vmfs/volumes/datastore1/
+
+#To execute a remote commando, use:
+plink.exe -no-antispoof -pw "your_password" root@HOST "touch /tmp/teste2"
