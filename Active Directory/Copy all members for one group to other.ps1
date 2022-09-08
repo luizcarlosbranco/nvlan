@@ -1,0 +1,1 @@
+Add-ADGroupMember -Identity 'NEW GROUP' -Members (Get-ADGroupMember -Identity 'ORIGINAL GROUP' -Recursive)
