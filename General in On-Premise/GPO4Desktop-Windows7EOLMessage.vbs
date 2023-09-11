@@ -6,13 +6,13 @@ Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\CIMV2")
 Set colItems = objWMIService.ExecQuery("SELECT * FROM Win32_OperatingSystem",,48)
 
 For Each objItem in colItems 
-	If InStr(objItem.Name, WindowsVersion) > 0 Then
+
+'	If InStr(objItem.Name, WindowsVersion) > 0 Then
 		dim answer
 		answer=MsgBox("Essa é uma mensagem automática da equipe da TI!" & vbcrlf &""& vbcrlf &_
-		"Seu computador possuí o Windows 7 e essa versão não terá mais suporte a partir de 2020" & vbcrlf &"" & vbcrlf &_
-		"Se você possui algum dispositivo do DETRAN (nesse caso NAO PODE ATUALIZAR O WINDOWS), clique em CANCELAR" & vbcrlf &"" & vbcrlf &_
-		"Caso não haja impedimento, clique em OK para abrir um chamado para este computador ser atualizado" _
-		,17,"Seu Windows irá EXPIRAR")
+		"Seu computador possuí o "&WindowsVersion&" e essa versão não terá mais suporte a partir de 2020" & vbcrlf &"" & vbcrlf &_
+		"Se você ainda não quer solicitar o upgrade do seu Windows, clique em CANCELAR" & vbcrlf &"" & vbcrlf &_
+		"Caso não haja impedimento, clique em OK para abrir um chamado para este computador ser atualizado",17,"Seu Windows irá EXPIRAR")
 
 		'MsgBox(prompt[,buttons][,title][,helpfile,context])
 		'0 = vbOKOnly - OK button only
@@ -38,6 +38,6 @@ For Each objItem in colItems
 		Else
 			MsgBox"Você cancelou o aviso, você continuará recebendo essa notificação toda vez que ligar o computador",48,"Script CANCELADO"
 		End If
-	End If
+'	End If
 	wscript.quit
 Next
