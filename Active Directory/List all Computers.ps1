@@ -1,1 +1,2 @@
-﻿Get-ADcomputer -Filter * -Properties Name, CanonicalName, OperatingSystem, whenCreated, lastLogonTimestamp | select Name, CanonicalName, OperatingSystem, whenCreated, @{Name="lastLogonTimestamp"; Expression={[DateTime]::FromFileTime($_.lastLogonTimestamp)}} | Out-GridView
+#https://www.linkedin.com/pulse/como-extrair-uma-lista-com-m%2525C3%2525A1quinas-que-ainda-o-windows-anacleto%3FtrackingId=vSfYyEH3S4mmMV7%252FBfl0lg%253D%253D/?trackingId=jIuxAqECu66h6XA%2B5XPoUg%3D%3D
+ Get-ADcomputer -Filter * -Properties Name, CanonicalName, OperatingSystem, whenCreated, lastLogonTimestamp | select Name, CanonicalName, OperatingSystem, whenCreated, @{Name="lastLogonTimestamp"; Expression={[DateTime]::FromFileTime($_.lastLogonTimestamp)}} | Out-GridView
