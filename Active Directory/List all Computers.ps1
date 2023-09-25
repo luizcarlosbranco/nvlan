@@ -1,0 +1,1 @@
+﻿Get-ADcomputer -Filter * -Properties Name, CanonicalName, OperatingSystem, whenCreated, lastLogonTimestamp | select Name, CanonicalName, OperatingSystem, whenCreated, @{Name="lastLogonTimestamp"; Expression={[DateTime]::FromFileTime($_.lastLogonTimestamp)}} | Out-GridView
