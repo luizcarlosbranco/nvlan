@@ -1,5 +1,5 @@
 ﻿$ExportReportTo = "C:\Temp\"
-$Folders = "E:\deptos_CNT\GA","E:\deptos_CNT\GDT","E:\deptos_CNT\GE","E:\deptos_CNT\GEP","E:\deptos_CNT\GGP","E:\deptos_CNT\GIE"
+$Folders = "E:\deptos\Folder1","E:\deptos\Folder2","F:\Projects\Project1","X:\Temp"
 $ExtensionsWhiteList = "bmp","bpm","crt","csr","csv","doc","docx","gif","jpg","jpeg","key","pbix","pdf","png","ppt","pptx","pps","psd","txt","vsd","xls","xlsx"
 $WordsWhiteList = "template"
 $Extensions = "7z","backup","bak","bkp","cab","dll","exe","iso","jar","js","lnk","mbd","mp3","msi","otf","rar","tar","tmp","ttf","zip"
