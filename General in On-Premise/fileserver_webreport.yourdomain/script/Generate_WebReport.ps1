@@ -5,6 +5,14 @@
 #http://woshub.com/powershell-get-folder-sizes/#:~:text=You%20can%20use%20the%20Get,(including%20subfolders)%20in%20PowerShell.
 #https://docs.microsoft.com/en-us/powershell/module/fileserverresourcemanager/new-fsrmstoragereport?view=windowsserver2022-ps
 
+# FSRM SETTINGS
+#Get-FsrmSetting | Select-Object *
+#Set-FsrmSetting –ReportLimitMaxFilesPerPropertyValue 1000000 –PassThru
+Set-FsrmSetting –ReportLeastAccessedMinimum 730 –PassThru
+Set-FsrmSetting –ReportLimitMaxDuplicateGroup 9999 –PassThru
+Set-FsrmSetting –ReportLimitMaxFile 99999 –PassThru
+Set-FsrmSetting –ReportLimitMaxFilesPerDuplicateGroup 9999 –PassThru
+
 # VARIABLES (EDIT AS YOUR NEEDS)
 $URLSite = "fileserver_webreport.yourdomain"
 $Targetfolder = "C:\inetpub\$URLSite"
