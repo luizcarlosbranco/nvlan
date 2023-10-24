@@ -22,7 +22,7 @@ $Folders | ForEach-Object {
 
     #Obtendo informação da pasta
         Write-host "- Getting Folder Content " -NoNewline
-        $FullList = Get-ChildItem -File -Recurse -Path "$FolderPath" | Select-Object Directory,Name,Extension,Filter,ObjectFound,CreationTime,LastAccessTime,LastWriteTime,Length,DirectoryCounted | Where-Object Directory -ne $Null
+        $FullList = Get-ChildItem -File -Recurse -Path "$FolderPath" | Select-Object DirectoryCounted,Directory,Name,Extension,Filter,ObjectFound,CreationTime,LastAccessTime,LastWriteTime,Length | Where-Object Directory -ne $Null
         Write-host "FINISHED" -ForegroundColor Green
 
     #Retirando o que for WHITELIST
@@ -79,7 +79,7 @@ $Folders | ForEach-Object {
         Write-host "FINISHED" -ForegroundColor Green
 
     #Carrego a lista APENAS do que foi capturado por algum filtro
-        $FullList = $FullList | Where-Object Filter -ne $Null
+        $FullList = $FullList | Where-Object Filter -ne $Null | Sort-Object -property DirectoryCounted –Descending
 
     #Organizar por COUNT
         Write-host "- Counting how many each folder is in the list: " -NoNewline
