@@ -4,7 +4,6 @@ $ExtensionsWhiteList = "bmp","bpm","crt","csr","csv","doc","docx","gif","jpg","j
 $WordsWhiteList = "template"
 $Extensions = "7z","backup","bak","bkp","cab","dll","exe","iso","jar","js","lnk","mbd","mp3","msi","otf","rar","tar","tmp","ttf","zip"
 $Words = "antig","apagar","backup","bak","bkp","checar","deletar","excluir","instalador","lixeira","software","suporte","temp","tmp"
-#curso,lixo,"old","olhar","pessoal","pessoais","programa", "anterior"
 #Colocar acentuação em Portugues
 chcp 1252
 $ErrorActionPreference= 'silentlycontinue'
