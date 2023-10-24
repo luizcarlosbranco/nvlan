@@ -79,7 +79,7 @@ $Folders | ForEach-Object {
         Write-host "FINISHED" -ForegroundColor Green
 
     #Carrego a lista APENAS do que foi capturado por algum filtro
-        $FullList = $FullList | Where-Object Filter -ne $Null | Sort-Object -property DirectoryCounted –Descending
+        $FullList = $FullList | Where-Object Filter -ne $Null
 
     #Organizar por COUNT
         Write-host "- Counting how many each folder is in the list: " -NoNewline
@@ -91,7 +91,8 @@ $Folders | ForEach-Object {
                 $_.DirectoryCounted = $count
             }
         }
-
+        $FullList = $FullList | Sort-Object -property DirectoryCounted –Descending
+    
     #Exportando para CSV
         Write-host "Saving " -NoNewline
         $FullList | Export-Csv -NoTypeInformation -Encoding UTF8 -Delimiter ';' "$ExportReportTo\$FolderName-Report.csv"
