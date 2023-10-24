@@ -14,8 +14,7 @@ $Folders | ForEach-Object {
     If (Test-Path "$FolderPath") {
         $FolderName = (get-item $FolderPath).Name
         Write-host "------------------------------"
-        date
-        Write-host "Folder $FolderName "
+        Write-host "- Folder $FolderName - $(date)"
     #Listar os fullpaths maiores do que 250
         Write-host "- Getting Long Folders " -NoNewline
         cd "$FolderPath"
