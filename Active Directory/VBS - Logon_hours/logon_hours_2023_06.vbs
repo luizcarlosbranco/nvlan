@@ -63,28 +63,15 @@ NextHour_UTC_Hour = DatePart("h", NextHour_UTC)
 NextHour_Hour_TZ = DatePart("h", NextHour_TZ)
 
 'VERIFICA SE TEM USUARIO LOGADO
-
-'Dim computer, UserIsLogged, wmi
-'computer = "."
-'Set wmi = GetObject("winmgmts://" & computer & "/root/cimv2")
-'UserIsLogged = wmi.ExecQuery("SELECT * FROM Win32_Process WHERE Name = 'LogonUI.exe'").Count
-
-Function IsWorkstationLocked()
-	Dim wmi
-	Set wmi = GetObject("winmgmts://./root/cimv2")
-	Dim logonScreenCount
-	logonScreenCount = wmi.ExecQuery ("SELECT * FROM Win32_Process WHERE Name = 'LogonUI.exe'").Count
- 	IsWorkstationLocked = (logonScreenCount > 0)
-End Function
+Dim computer, UserIsLogged, wmi
+computer = "."
+Set wmi = GetObject("winmgmts://" & computer & "/root/cimv2")
+UserIsLogged = wmi.ExecQuery("SELECT * FROM Win32_Process WHERE Name = 'LogonUI.exe'").Count
 
 '-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
 If isnull(objArgs(0)) or isempty(objArgs(0)) then
 	'Se tiver usuario logado
-	
-	'If NOT (UserIsLogged ) Then
-	If IsWorkstationLocked() Then
-
-
+	If NOT (UserIsLogged ) Then
 		'Vamos dar alerta se na proxima hora vai acabar o horario de logon OU bloquear se já acabou o tempo
 		If Schedule(Now_Weekday,Now_Hour_UTC) = 0 Then
 			Set oShell = WScript.CreateObject ("WScript.Shell")
