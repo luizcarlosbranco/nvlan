@@ -341,6 +341,8 @@ Function PrinterConsumptionHistory{
         $dataObject = New-Object PSObject
         $TotalColor = ([Math]::Round($TotalColorPrinted-$last_check_color))
         $TotalBW = ([Math]::Round($TotalBWPrinted-$last_check_bw))
+        If ($TotalColor -lt 0) {$TotalColor=0}
+        If ($TotalBW -lt 0) {$TotalBW=0}
         Add-Member -inputObject $dataObject -memberType NoteProperty -name "Printer_Name" -value $Printer_Name
         Add-Member -inputObject $dataObject -memberType NoteProperty -name "Checked_Date" -value $Date
         Add-Member -inputObject $dataObject -memberType NoteProperty -name "TotalBWPrinted" -value $TotalBW
@@ -421,7 +423,7 @@ $PrintList | ForEach-Object {
             $PrinterHistory = ImportPrinterHistory "$DestinationFolder\script\history.csv"
             $PrinterHistory_FirstMonthCheck = $PrinterHistory | Where-Object { $_.Printer_Name -eq $Name -AND $_.FirstMonthCheck -eq "True" }
             $PrinterConsumptionHistory = PrinterConsumptionHistory -List $PrinterHistory_FirstMonthCheck
-            CreateGraph -List $PrinterConsumptionHistory -SaveAs "$DestinationFolder\assets\images\$Name`_Chart_PrinterHistory.png" -Width 1000 -Height 500 -MainTitle "$Name - Consumption History" -TitleAxisX "Collected Date" -TitleAxisY "Consumption" -Series1Name "BlackAndWhite" -Series1Color "#000000" -Series1AxisXSource "Checked_Date" -Series1AxisYSource "TotalBWPrinted" -Series2Name "Colorida" -Series2Color "#62B5CC" -Series2AxisXSource "Checked_Date" -Series2AxisYSource "TotalColorPrinted" -ChartType "Column" -WithLegendOn "Right"
+            CreateGraph -List $PrinterConsumptionHistory -SaveAs "$DestinationFolder\assets\images\$Name`_Chart_PrinterHistory.png" -Width 1500 -Height 500 -MainTitle "$Name - Consumption History" -TitleAxisX "Collected Date" -TitleAxisY "Consumption" -Series1Name "BlackAndWhite" -Series1Color "#000000" -Series1AxisXSource "Checked_Date" -Series1AxisYSource "TotalBWPrinted" -Series2Name "Colorida" -Series2Color "#62B5CC" -Series2AxisXSource "Checked_Date" -Series2AxisYSource "TotalColorPrinted" -ChartType "Column" -WithLegendOn "Right"
         }
         Else 
         {
