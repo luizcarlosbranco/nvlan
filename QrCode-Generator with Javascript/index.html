@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Gerador de QR Code CNT</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+	
+
+	<script type="text/javascript" src="qrcode.js"></script>
+
+</head>
+
+
+
+<body>
+
+
+	<style>
+		input:valid {
+			border-color: #ced4da !important;
+			background-image: none !important;
+		}
+
+		input:valid~.form-check-label {
+			color: black !important;
+		}
+
+		select:valid {
+			border-color: #ced4da !important;
+			background-image: none !important;
+		}
+
+		select.form-select {
+			-webkit-appearance: menulist !important;
+			-moz-appearance: menulist !important;
+			-ms-appearance: menulist !important;
+			-o-appearance: menulist !important;
+			appearance: menulist !important;
+			width: 100%;
+			padding: 7px 0px;
+			border: 2px solid #ccc;
+			border-radius: 7px;
+		}
+
+		.custom-table {
+			width: 100%;
+		}
+
+		.custom-btn-container {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+		}
+
+		.custom-table .btn {
+			margin-top: 32px;
+		}
+
+		.custom-table td {
+			padding: 10px;
+			vertical-align: top;
+		}
+
+		.form-select {
+			width: auto;
+		}
+
+		.custom-table input[type="color"] {
+
+			height: 40px;
+			padding: 2px;
+			border: 2px solid #ccc;
+			border-radius: 4px;
+		}
+
+		.custom-table label {
+			margin-bottom: 6px;
+			text-align: left;
+		}
+
+		#qrcode-container {
+			position: relative;
+			width: 300px;
+			height: 300px;
+			margin-top: 15px;
+		}
+
+		#qrcode-image {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 105px;
+			height: 55px;
+			z-index: 1;
+			display: none;
+			border-radius: 05px;
+			padding: 05px;
+			background-color: white;
+
+		}
+	</style>
+
+	<div class="container">
+		<div class="position-absolute top-50 start-50 translate-middle" style="height: 100%; width: 80%;">
+			<div class="row p-5 justify-content-between">
+				<div class="col-6">
+					<div class="tab-content" id="v-pills-tabContent">
+						<div class="container">
+							<h1>QRCode</h1>
+							<label for="dropName" style="display: inline-block;">Tipo</label>
+							<ul class="nav nav-tabs mb-3" id="standort" role="tablist" style="display: inline-block;">
+								<li class="nav-item dropdown" role="presentation">
+									<a id="dropName" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+										role="button" aria-expanded="false">
+										<span id="selectedQrType">Endereço web (URL)</span>
+									</a>
+									<ul class="dropdown-menu">
+										<li class="nav-item drop-item">
+											<button class="dropdown-item nav-link active" id="v-pills-url-tab"
+												data-bs-toggle="tab" data-bs-target="#v-pills-url" type="button"
+												role="tab" aria-controls="v-pills-url" aria-selected="true"
+												onclick="updateSelectedQrType('Endereço web (URL)')">Endereço web
+												(URL)</button>
+										</li>
+										<li class="nav-item drop-item">
+											<button class="dropdown-item nav-link" id="v-pills-vcard-tab"
+												data-bs-toggle="tab" data-bs-target="#v-pills-vcard" type="button"
+												role="tab" aria-controls="v-pills-vcard" aria-selected="false"
+												onclick="updateSelectedQrType('Informações de contato (V-Card)')">Informações
+												de contato (V-Card)</button>
+										</li>
+										<li class="nav-item drop-item">
+											<button class="dropdown-item nav-link" id="v-pills-wifi-tab"
+												data-bs-toggle="tab" data-bs-target="#v-pills-wifi" type="button"
+												role="tab" aria-controls="v-pills-wifi" aria-selected="false"
+												onclick="updateSelectedQrType('Rede Wi-fi')">Rede Wi-fi</button>
+										</li>
+										<li class="nav-item drop-item">
+											<button class="dropdown-item nav-link" id="v-pills-whatsapp-tab"
+												data-bs-toggle="tab" data-bs-target="#v-pills-whatsapp" type="button"
+												role="tab" aria-controls="v-pills-whatsapp" aria-selected="false"
+												onclick="updateSelectedQrType('Contato por Whatsapp')">Contato por
+												Whatsapp</button>
+										</li>
+										<li class="nav-item drop-item">
+											<button class="dropdown-item nav-link" id="v-pills-evento-tab"
+												data-bs-toggle="tab" data-bs-target="#v-pills-evento" type="button"
+												role="tab" aria-controls="v-pills-evento" aria-selected="false"
+												onclick="updateSelectedQrType('Cadastro de Evento')">Cadastro de
+												Evento</button>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+						<div class="tab-pane fade show active" id="v-pills-url" role="tabpanel"
+							aria-labelledby="v-pills-url-tab" tabindex="0">
+							<form id="formEnderecoWeb" class="row g-3 ">
+								<div class="col-12">
+									<label for="TextURL" class="form-label">URL (ex: https://cnt.org.br)</label>
+									<input type="url" class="form-control" id="TextURL" required>
+								</div>
+							</form>
+						</div>
+						<div class="tab-pane fade" id="v-pills-vcard" role="tabpanel"
+							aria-labelledby="v-pills-vcard-tab" tabindex="0">
+							<form class="row g-3" id="formVCard">
+								<div class="col-md-6">
+									<label for="VCardFirstName" class="form-label">Nome</label>
+									<input type="text" class="form-control" id="VCardFirstName" required>
+								</div>
+								<div class="col-md-6">
+									<label for="VCardLastName" class="form-label">Sobrenome</label>
+									<input type="text" class="form-control" id="VCardLastName" required>
+								</div>
+								<div class="col-md-6">
+									<label for="VCardEmail" class="form-label">Email</label>
+									<input type="email" class="form-control" id="VCardEmail" required>
+								</div>
+								<div class="col-md-6">
+									<label for="VCardCel" class="form-label">Celular</label>
+									<input type="tel" class="form-control" id="VCardCel" required>
+								</div>
+								<div class="col-md-6">
+									<label for="VCardHomeTel" class="form-label">Telefone</label>
+									<input type="tel" class="form-control" id="VCardHomeTel">
+								</div>
+								<div class="col-md-6">
+									<label for="VCardCompany" class="form-label">Nome da empresa</label>
+									<input type="text" class="form-control" id="VCardCompany">
+								</div>
+								<div class="col-md-6">
+									<label for="VCardTitle" class="form-label">Cargo</label>
+									<input type="text" class="form-control" id="VCardTitle">
+								</div>
+								<div class="col-md-6">
+									<label for="VCardAddress" class="form-label">Endereço</label>
+									<input type="text" class="form-control" id="VCardAddress">
+								</div>
+								<div class="col-md-6">
+									<label for="VCardCity" class="form-label">Cidade</label>
+									<input type="text" class="form-control" id="VCardCity">
+								</div>
+								<div class="col-md-6">
+									<label for="VCardPostal" class="form-label">CEP</label>
+									<input type="text" class="form-control" id="VCardPostal">
+								</div>
+								<div class="col-md-6">
+									<label for="VCardCountry" class="form-label">País</label>
+									<input type="text" class="form-control" id="VCardCountry">
+								</div>
+								<div class="col-md-6">
+									<label for="VCardURL" class="form-label">Site web (ex: https://cnt.org.br)</label>
+									<input type="url" class="form-control" id="VCardURL">
+								</div>
+							</form>
+						</div>
+						<div class="tab-pane fade" id="v-pills-wifi" role="tabpanel" aria-labelledby="v-pills-wifi-tab"
+							tabindex="0">
+							<form id="formWifi" class="row g-3 was-validated">
+								<div class="col-md-6">
+									<label for="WiFiName" class="form-label">Qual é o nome desta rede Wi-Fi</label>
+									<input type="text" class="form-control" id="WiFiName" required>
+								</div>
+								<div class="col-md-6">
+									<label for="WiFiPassword" class="form-label">Qual é a senha desta rede</label>
+									<input type="text" class="form-control" id="WiFiPassword">
+								</div>
+
+								<div class="col-md-6">
+									<label for="WiFiSecurity" class="form-label">Qual é a criptografia desta
+										rede?</label>
+									<select id="WiFiSecurity" class="form-select">
+										<option value="WEP" selected>WEP</option>
+										<option value="WPA">WAP/WPA2</option>
+									</select>
+								</div>
+								<div class="col-12">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" id="WiFiHide" value="true">
+										<label class="form-check-label" for="WiFiHide">
+											É uma rede oculta
+										</label>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="tab-pane fade" id="v-pills-whatsapp" role="tabpanel"
+							aria-labelledby="v-pills-whatsapp-tab" tabindex="0">
+							<form id="formWhatsapp" class="row g-3 was-validated">
+								<div class="col-md-6">
+									<label for="WhatsappNumber" class="form-label">Número do telefone</label>
+									<input type="text" class="form-control" id="WhatsappNumber" required>
+								</div>
+								<div class="col-12">
+									<label for="WhatsappMessage" class="form-label">Mensagem</label>
+									<input type="text" class="form-control" id="WhatsappMessage" required>
+								</div>
+							</form>
+						</div>
+						<div class="tab-pane fade" id="v-pills-evento" role="tabpanel"
+							aria-labelledby="v-pills-evento-tab" tabindex="0">
+							<form id="formEvento" class="row g-3 was-validated">
+								<div class="col-md-6">
+									<label for="EventSUMMARY" class="form-label">Nome do evento</label>
+									<input type="text" class="form-control" id="EventSUMMARY" required>
+								</div>
+								<div class="col-md-6">
+									<label for="EventLOCATION" class="form-label">Endereço do evento</label>
+									<input type="text" class="form-control" id="EventLOCATION">
+								</div>
+								<div class="col-md-6">
+									<label for="EventDTSTARTDate" class="form-label">Data de início</label>
+									<input type="datetime-local" class="form-control" id="EventDTSTARTDate" required>
+								</div>
+								<div class="col-md-6">
+									<label for="EventDTENDDate" class="form-label">Data fim</label>
+									<input type="datetime-local" class="form-control" id="EventDTENDDate">
+								</div>
+
+								<div class="col-12">
+									<label for="EventDESCRIPTION" class="form-label">Descrição</label>
+									<input type="text" class="form-control" id="EventDESCRIPTION">
+								</div>
+							</form>
+						</div>
+						<div class="row mt-3">
+							<div class="col-8">
+								<table class="custom-table">
+									<tr>
+										<td>
+											<label for="QRCodeColor">QRCode</label><br>
+											<input type="color" id="QRCodeColor" value="#00366e">
+										</td>
+										<td>
+											<label for="QRCodeBackgroundColor">Fundo</label><br>
+											<input type="color" id="QRCodeBackgroundColor" value="#ffffff">
+										</td>
+										<td>
+											<label for="qualidadeqrcode">Qualidade</label><br>
+											<select class="form-select" id="qualidadeqrcode"
+												aria-label="Default select example">
+												<option value="1">Baixa</option>
+												<option value="0"> Média</option>
+												<option value="3" selected="selected">Alta</option>
+												<option value="2">Muito alta</option>
+											</select>
+										</td>
+										<td class="custom-btn-container">
+											<button type="button" id="gerarQRCode"
+												class="btn btn-primary">Gerar</button>
+										</td>
+									</tr>
+								</table>
+							</div>
+							<div class="col text-start">
+								<em id="infoObrigatorio" class="invalid-feedback">Campo obrigatório incompleto!</em>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="container">
+				<div id="qrcode-container">
+					<div id="qrcode" style="width: 300px; height: 300px; display: none;"></div>
+					<img src="logo.png" alt="Logo" id="qrcode-image">
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script type="text/javascript">
+		var QrCodeType = 'URL';
+		var activeForm = document.getElementById('formEnderecoWeb');
+		var qrcodeElement = document.getElementById('qrcode');
+		var infoObrigatorio = document.getElementById('infoObrigatorio');
+
+		function updateSelectedQrType(text) {
+			document.getElementById('selectedQrType').textContent = text;
+		}
+
+		updateSelectedQrType('Endereço web (URL)');
+
+		document.getElementById('v-pills-url-tab').addEventListener('click', function (event) {
+			activeForm = document.getElementById('formEnderecoWeb');
+			activeForm.classList.remove('was-validated');
+			qrcodeElement.style.display = 'none';
+			infoObrigatorio.style.display = 'none';
+			QrCodeType = 'URL';
+		});
+
+		document.getElementById('v-pills-vcard-tab').addEventListener('click', function (event) {
+			activeForm = document.getElementById('formVCard');
+			activeForm.classList.remove('was-validated');
+			qrcodeElement.style.display = 'none';
+			infoObrigatorio.style.display = 'none';
+			QrCodeType = 'VCard';
+		});
+
+		document.getElementById('v-pills-wifi-tab').addEventListener('click', function (event) {
+			activeForm = document.getElementById('formWifi');
+			activeForm.classList.remove('was-validated');
+			qrcodeElement.style.display = 'none';
+			infoObrigatorio.style.display = 'none';
+			QrCodeType = 'WIFI';
+		});
+
+		document.getElementById('v-pills-whatsapp-tab').addEventListener('click', function (event) {
+			activeForm = document.getElementById('formWhatsapp');
+			activeForm.classList.remove('was-validated');
+			qrcodeElement.style.display = 'none';
+			infoObrigatorio.style.display = 'none';
+			QrCodeType = 'Whatsapp';
+		});
+
+		document.getElementById('v-pills-evento-tab').addEventListener('click', function (event) {
+			activeForm = document.getElementById('formEvento');
+			activeForm.classList.remove('was-validated');
+			qrcodeElement.style.display = 'none';
+			infoObrigatorio.style.display = 'none';
+			QrCodeType = 'Event';
+		});
+
+		document.getElementById('gerarQRCode').addEventListener('click', function (event) {
+			validateForm(activeForm);
+		});
+
+		function validateForm(form) {
+			if (form.checkValidity()) {
+				form.classList.remove('was-validated');
+				infoObrigatorio.style.display = 'none';
+				GenerateQrCode();
+			} else {
+				form.classList.add('was-validated');
+				infoObrigatorio.style.display = 'block';
+			}
+		}
+
+		$("#text").
+			on("blur", function () {
+				makeCode();
+			}).
+			on("keydown", function (e) {
+				if (e.keyCode == 13) {
+					makeCode();
+				}
+			});
+
+		function ValidaEmail(Email) {
+			if ((!(Email).includes("@")) || (!(Email).includes(".")) || ((Email).includes(" "))) {
+				alert("E-Mail invalido");
+				return;
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function () {
+			function updateSelectedQrType(type) {
+				document.getElementById("selectedQrType").innerText = type;
+				document.getElementById("qrcode-image").style.display = 'none';
+				document.getElementById("qrcode").style.display = 'none';
+			}
+
+
+			function GenerateQrCode() {
+				let QrCodeText;
+				if (QrCodeType == "URL") {
+					QrCodeText = document.getElementById("TextURL").value.replace(/ /g, "");;
+					if (!QrCodeText) {
+						alert("Não pode ser em branco");
+						return;
+					}
+				}
+				if (QrCodeType == "VCard") {
+					if ((!document.getElementById("VCardFirstName").value) || (!document.getElementById("VCardLastName").value) || (!document.getElementById("VCardCel").value) || (!document.getElementById("VCardEmail").value)) {
+						alert("Obrigatório o Nome, Sobrenome, E-Mail e Celular");
+						return;
+					}
+					ValidaEmail(document.getElementById("VCardEmail").value);
+					QrCodeText = "BEGIN:VCARD";
+					QrCodeText = QrCodeText + "\n" + "VERSION:2.1";
+					QrCodeText = QrCodeText + "\n" + "N;CHARSET=UTF-8:" + document.getElementById("VCardLastName").value + ";" + document.getElementById("VCardFirstName").value;
+					QrCodeText = QrCodeText + "\n" + "FN;CHARSET=UTF-8:" + document.getElementById("VCardFirstName").value + " " + document.getElementById("VCardLastName").value;
+					QrCodeText = QrCodeText + "\n" + "TEL;CELL:" + document.getElementById("VCardCel").value;
+					if (document.getElementById("VCardHomeTel").value) {
+						QrCodeText = QrCodeText + "\n" + "TEL;HOME;VOICE:" + document.getElementById("VCardHomeTel").value;
+					}
+					if (document.getElementById("VCardCompany").value) {
+						QrCodeText = QrCodeText + "\n" + "ORG;CHARSET=UTF-8:" + document.getElementById("VCardCompany").value;
+					}
+					if (document.getElementById("VCardTitle").value) {
+						QrCodeText = QrCodeText + "\n" + "TITLE;CHARSET=UTF-8:" + document.getElementById("VCardTitle").value;
+					}
+					if ((document.getElementById("VCardAddress").value) && (document.getElementById("VCardCity").value) && (document.getElementById("VCardPostal").value) && (document.getElementById("VCardCountry").value)) {
+						QrCodeText = QrCodeText + "\n" + "ADR;CHARSET=UTF-8;WORK;PREF:;;" + document.getElementById("VCardAddress").value + ";" + document.getElementById("VCardCity").value + ";" + document.getElementById("VCardPostal").value + ";" + document.getElementById("VCardCountry").value;
+					}
+					QrCodeText = QrCodeText + "\n" + "EMAIL:" + document.getElementById("VCardEmail").value;
+					if (document.getElementById("VCardURL").value) {
+						QrCodeText = QrCodeText + "\n" + "URL:"
+						QrCodeText = QrCodeText + "" + document.getElementById("VCardURL").value.replace(/ /g, "+");;
+					}
+					QrCodeText = QrCodeText + "\n" + "END:VCARD";
+				}
+				if (QrCodeType == "WIFI") {
+					QrCodeText = "WIFI:S:" + document.getElementById("WiFiName").value;
+					QrCodeText = QrCodeText + ";T:" + document.getElementById("WiFiSecurity").value;
+					QrCodeText = QrCodeText + ";P:" + document.getElementById("WiFiPassword").value;
+					QrCodeText = QrCodeText + ";H:" + document.getElementById("WiFiHide").value;
+				}
+				if (QrCodeType == "Whatsapp") {
+					QrCodeText = "https://wa.me/" + document.getElementById("WhatsappNumber").value;
+					QrCodeText = QrCodeText + "/?text="
+					QrCodeText = QrCodeText + document.getElementById("WhatsappMessage").value.replace(/ /g, "+");
+					QrCodeText = QrCodeText.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+				}
+				if (QrCodeType == "Event") {
+					if ((!document.getElementById("EventSUMMARY").value) || (!document.getElementById("EventDTSTARTDate").value)) {
+						alert("Nome do Evento e data de inicio são campos obrigatórios");
+						return;
+					}
+
+					QrCodeText = "BEGIN:VEVENT";
+					QrCodeText = QrCodeText + "\n" + "SUMMARY:" + document.getElementById("EventSUMMARY").value;
+					QrCodeText = QrCodeText + "\n" + "DTSTART:" + document.getElementById("EventDTSTARTDate").value.replace(/-/g, '').replace(':', '') + "00";
+					if ((document.getElementById("EventDTENDDate").value)) {
+						QrCodeText = QrCodeText + "\n" + "DTEND:" + document.getElementById("EventDTENDDate").value.replace(/-/g, '').replace(':', '') + "00";
+					}
+					if (document.getElementById("EventLOCATION").value) {
+						QrCodeText = QrCodeText + "\n" + "LOCATION:" + document.getElementById("EventLOCATION").value;
+					}
+					if (document.getElementById("EventDESCRIPTION").value) {
+						QrCodeText = QrCodeText + "\n" + "DESCRIPTION:" + document.getElementById("EventDESCRIPTION").value;
+					}
+
+					QrCodeText = QrCodeText + "\n" + "END:VEVENT";
+
+				}
+				document.getElementById("qrcode").innerHTML = "";
+
+				var qrcode = new QRCode(document.getElementById("qrcode"), {
+					text: QrCodeText.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+					width: 300,
+					height: 300,
+					colorDark: document.getElementById("QRCodeColor").value,
+					colorLight: document.getElementById("QRCodeBackgroundColor").value,
+					correctLevel: parseInt(document.getElementById("qualidadeqrcode").value, 10)
+
+				});
+
+				document.getElementById('qrcode-image').style.display = 'block';
+
+				document.getElementById('qrcode').style.display = 'block';
+
+
+			}
+
+			document.getElementById('gerarQRCode').addEventListener('click', GenerateQrCode);
+
+			document.addEventListener('keydown', function (event) {
+				if (event.key === 'Enter') {
+					event.preventDefault();
+					GenerateQrCode();
+				}
+			});
+
+			const qrTypeButtons = document.querySelectorAll('.dropdown-item.nav-link');
+			qrTypeButtons.forEach(button => {
+				button.addEventListener('click', function () {
+					updateSelectedQrType(button.innerText);
+				});
+			});
+		});
+
+	</script>
+</body>
+
+</html>
