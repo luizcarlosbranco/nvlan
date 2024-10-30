@@ -155,6 +155,12 @@
 												onclick="updateSelectedQrType('Cadastro de Evento')">Cadastro de
 												Evento</button>
 										</li>
+										<li class="nav-item drop-item">
+											<button class="dropdown-item nav-link" id="v-pills-email-tab"
+												data-bs-toggle="tab" data-bs-target="#v-pills-email" type="button"
+												role="tab" aria-controls="v-pills-email" aria-selected="false"
+												onclick="updateSelectedQrType('Contato por E-Mail')">Contato por E-Mail</button>
+										</li>
 									</ul>
 								</li>
 							</ul>
@@ -251,8 +257,7 @@
 								</div>
 							</form>
 						</div>
-						<div class="tab-pane fade" id="v-pills-whatsapp" role="tabpanel"
-							aria-labelledby="v-pills-whatsapp-tab" tabindex="0">
+						<div class="tab-pane fade" id="v-pills-whatsapp" role="tabpanel" aria-labelledby="v-pills-whatsapp-tab" tabindex="0">
 							<form id="formWhatsapp" class="row g-3 was-validated">
 								<div class="col-md-6">
 									<label for="WhatsappNumber" class="form-label">Número do telefone</label>
@@ -264,8 +269,7 @@
 								</div>
 							</form>
 						</div>
-						<div class="tab-pane fade" id="v-pills-evento" role="tabpanel"
-							aria-labelledby="v-pills-evento-tab" tabindex="0">
+						<div class="tab-pane fade" id="v-pills-evento" role="tabpanel" aria-labelledby="v-pills-evento-tab" tabindex="0">
 							<form id="formEvento" class="row g-3 was-validated">
 								<div class="col-md-6">
 									<label for="EventSUMMARY" class="form-label">Nome do evento</label>
@@ -287,6 +291,22 @@
 								<div class="col-12">
 									<label for="EventDESCRIPTION" class="form-label">Descrição</label>
 									<input type="text" class="form-control" id="EventDESCRIPTION">
+								</div>
+							</form>
+						</div>
+						<div class="tab-pane fade" id="v-pills-email" role="tabpanel" aria-labelledby="v-pills-email-tab" tabindex="0">
+							<form id="formEmail" class="row g-3 was-validated">
+								<div class="col-md-6">
+									<label for="EmailRecipient" class="form-label">Para</label>
+									<input type="email" class="form-control" id="EmailRecipient" required>
+								</div>
+								<div class="col-md-6">
+									<label for="EmailSubject" class="form-label">Assunto</label>
+									<input type="text" class="form-control" id="EmailSubject" required>
+								</div>
+								<div class="col-12">
+									<label for="EmailMessage" class="form-label">Mensagem</label>
+									<input type="text" class="form-control" id="EmailMessage" required>
 								</div>
 							</form>
 						</div>
@@ -386,6 +406,14 @@
 			qrcodeElement.style.display = 'none';
 			infoObrigatorio.style.display = 'none';
 			QrCodeType = 'Event';
+		});
+		
+		document.getElementById('v-pills-email-tab').addEventListener('click', function (event) {
+			activeForm = document.getElementById('formEmail');
+			activeForm.classList.remove('was-validated');
+			qrcodeElement.style.display = 'none';
+			infoObrigatorio.style.display = 'none';
+			QrCodeType = 'EMAIL';
 		});
 
 		document.getElementById('gerarQRCode').addEventListener('click', function (event) {
@@ -500,6 +528,11 @@
 
 					QrCodeText = QrCodeText + "\n" + "END:VEVENT";
 
+				}
+				if (QrCodeType == "EMAIL") {
+					QrCodeText = "MATMSG:TO:" + document.getElementById("EmailRecipient").value;
+					QrCodeText = QrCodeText + ";SUB:" + document.getElementById("EmailSubject").value;
+					QrCodeText = QrCodeText + ";BODY:" + document.getElementById("EmailMessage").value + ";;";
 				}
 				document.getElementById("qrcode").innerHTML = "";
 
