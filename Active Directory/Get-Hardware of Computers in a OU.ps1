@@ -1,5 +1,5 @@
 ﻿#SET THE OU
-$SEARCH_OU="OU=NAME_OU,DC=yourdomain,DC=com"
+$SEARCH_OU="OU=.CNT,DC=cnt,DC=org,DC=br"
 
 #SCRIPT
 $ErrorActionPreference= 'silentlycontinue'
@@ -40,6 +40,10 @@ Get-ADComputer -filter * -Searchbase $SEARCH_OU -Properties Description | ForEac
         $TotalVisibleMemorySize = [math]::Round((($memory.TotalVisibleMemorySize) / 1024)/ 1024)
         $PercentUsedMemory = [math]::Round((($memory.TotalVisibleMemorySize - $memory.FreePhysicalMemory) / ($memory.TotalVisibleMemorySize)) * 100)
 
+        #---    USER   ---
+        $user = $null
+        $user = (query user /server:$Name | select -Skip 1).split(" ")[1]
+
         #Adicionando uma nova linha
         $KeyData = $null
         $KeyData = New-Object PSObject
@@ -52,6 +56,7 @@ Get-ADComputer -filter * -Searchbase $SEARCH_OU -Properties Description | ForEac
         $KeyData | Add-Member -MemberType NoteProperty -Name "PercentDiskTime" -Value "$PercentDiskTime"
         $KeyData | Add-Member -MemberType NoteProperty -Name "Total Memory" -Value "$TotalVisibleMemorySize"
         $KeyData | Add-Member -MemberType NoteProperty -Name "Percent Memory Usage" -Value "$PercentUsedMemory"
+        $KeyData | Add-Member -MemberType NoteProperty -Name "User" -Value "$user"
         $KeysArray += $KeyData
         write-host " - OK" -ForegroundColor Green
         write-host "------------------------------------------------------------------------"
@@ -62,4 +67,4 @@ Get-ADComputer -filter * -Searchbase $SEARCH_OU -Properties Description | ForEac
         write-host "------------------------------------------------------------------------"
     }
 }
-$KeysArray | ft
+$KeysArray | Export-Csv -NoTypeInformation -Encoding UTF8 -Delimiter ';' "C:\Temp\Inventory.csv"
