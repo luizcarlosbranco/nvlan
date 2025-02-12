@@ -1,5 +1,5 @@
 ﻿#SET THE OU
-$SEARCH_OU="OU=.CNT,DC=cnt,DC=org,DC=br"
+$SEARCH_OU="OU=COMPUTADORES,DC=seudominio,DC=com,DC=br"
 
 #SCRIPT
 $ErrorActionPreference= 'silentlycontinue'
