@@ -1,5 +1,5 @@
 ﻿$FolderPath = "D:\Sector" # Just an Example
-$NETBIOS_DOMAINNAME = "SESTSENAT"
+$NETBIOS_DOMAINNAME = "YOURDOMAIN"
 $ADD_GROUP_NAME = "domain admins"
 $ADD_PERMITION = "FullControl" #FullControl, Modify, AppendData, CreateFiles, ReadAttributes, ReadPermissions, etc. - Use (Get-Acl 'L:\Test\Beez\RAPJOUR\Appels List\Correct').Access
 $RULE = "Allow" # Allow or Deny
