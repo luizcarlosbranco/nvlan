@@ -21,7 +21,7 @@ If ( ($RemotePackageList | Where-Object Name -eq "NET-Framework-Core").Installed
     $selectedFolder = $folder.Self.Path
     if ( ($folder) -and (Get-ChildItem $selectedFolder -Filter "*-netfx3-*.cab" -File) ) {
         Write-Host ""
-        Write-Host -NoNewline "------ Instaling NET-Framework-Core : "
+        Write-Host -NoNewline "------ Installing NET-Framework-Core : "
         If ( !(Install-WindowsFeature -Name NET-Framework-Core -Source $selectedFolder).Success) { Write-Host -ForegroundColor Red " Error installing $DisplayName" }
         Else { Write-Host -ForegroundColor Green " OK " }
     }
