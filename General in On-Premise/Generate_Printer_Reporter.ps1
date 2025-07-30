@@ -1,4 +1,4 @@
-﻿#https://stackoverflow.com/questions/33707193/how-to-convert-string-to-integer-in-powershell
+#https://stackoverflow.com/questions/33707193/how-to-convert-string-to-integer-in-powershell
 #https://stackoverflow.com/questions/17548523/the-term-get-aduser-is-not-recognized-as-the-name-of-a-cmdlet
 #https://bytecookie.wordpress.com/category/winforms/
 #3D - https://docs.microsoft.com/pt-br/dotnet/api/system.windows.forms.datavisualization.charting.chartarea.area3dstyle?view=netframework-4.8#system-windows-forms-datavisualization-charting-chartarea-area3dstyle
@@ -8,10 +8,11 @@
 #dicas https://social.msdn.microsoft.com/Forums/vstudio/en-US/ce236753-1bc3-4dce-8753-f8509c2a2082/fixed-percentage-labels-on-axis-bar-chart?forum=MSWinWebChart
 #https://stackoverflow.com/questions/53695686/chart-point-labels-wont-work-with-2-charts-created-instead-of-1
 #https://communities.vmware.com/t5/VMware-PowerCLI-Discussions/Unable-to-add-used-inside-the-doughnut-chart/td-p/510798
-
+$ErrorActionPreference = "Stop"
 #Se não tiver os módulos de AD:
-#Import-Module ServerManager
-#Add-WindowsFeature RSAT-AD-PowerShell
+Import-Module ServerManager
+Get-WindowsCapability -Name RSAT.ActiveDirectory* -Online | Add-WindowsCapability -Online
+Add-WindowsFeature RSAT-AD-PowerShell | Out-Null
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #    NAO ALTERE ESSES
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -20,7 +21,7 @@
 
 #$Printer_Name = "DIEX_14A"
 
-$DestinationFolder = "C:\inetpub\wwwroot\impressao.cnt.org.br"
+$DestinationFolder = "C:\inetpub\wwwroot\impressao.SEUDOMINIO.COM"
 $PaperCutLogFolder = "C:\Program Files (x86)\PaperCut Print Logger\logs\csv\monthly\$PaperCutFile"
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #    LOADING GRAPH LIBRARIES
@@ -35,7 +36,7 @@ Function CalculateTotalsOfAnList{
      [PSObject]$List,
      [string]$Unique
     )
-    Write-Host "Initializing CalculateTotalsOfAnList"
+    Write-Host "Function CalculateTotalsOfAnList - Initialized"
     $List_CalculateTotalsOfAnList = New-Object PSObject
     $List_CalculateTotalsOfAnList = @()
     $List | select $Unique -Unique | ForEach-Object {
@@ -49,7 +50,6 @@ Function CalculateTotalsOfAnList{
         }
         $List_CalculateTotalsOfAnList += $dataObject
     }
-    Write-Host "CalculateTotalsOfAnList Finished"
     return $List_CalculateTotalsOfAnList
 }
 
@@ -58,7 +58,7 @@ Function ConvertFromPaperCutLog{
         [String]$PaperCutLogFile,
         [String]$PrinterName
     )
-    Write-Host "Initializing ConvertFromPaperCutLog"
+    Write-Host "Function ConvertFromPaperCutLog - Initialized"
     If (Test-Path -Path $PaperCutLogFile){
         $List_ConvertFromPaperCutLog = Get-Content "$PaperCutLogFile" | select -Skip 1 | ConvertFrom-Csv | Where-Object { $_.Printer -like "$PrinterName*" } | select User,Pages,Copies,"Paper Size",Duplex,Grayscale
         $List_ConvertFromPaperCutLog | Add-Member -MemberType NoteProperty -Name "PrintedInColor" -Value "0"
@@ -67,7 +67,6 @@ Function ConvertFromPaperCutLog{
         $List_ConvertFromPaperCutLog | ForEach-Object {
             $_.CountedPages = [Math]::Round([int]$_.Pages*[int]$_.Copies)
             If ($_."Paper Size" -eq "A3") { $_.CountedPages = [Math]::Round($_.CountedPages*2) }
-            #If ($_.Duplex -ne "NOT DUPLEX") { $_.CountedPages = [Math]::Round($_.CountedPages*2) }
             If ($_.Grayscale -eq "NOT GRAYSCALE")
             {
                 $_.PrintedInBW = "0"
@@ -77,11 +76,10 @@ Function ConvertFromPaperCutLog{
             $_.PrintedInColor = [Math]::Round([int]$_.PrintedInColor*[int]$_.CountedPages)
         }
         $List_ConvertFromPaperCutLog = $List_ConvertFromPaperCutLog | Select-Object -Property * -ExcludeProperty Grayscale,Pages,Copies,"Paper Size",CountedPages,Duplex
-        Write-Host "ConvertFromPaperCutLog Finished"
         Return $List_ConvertFromPaperCutLog
     }
     Else {
-        Write-Host "$PaperCutLogFile not found !"
+        Write-Host "PaperCutLogFile $PaperCutLogFile not found !"
         break
     }
 }
@@ -91,13 +89,12 @@ Function ConvertFromListLDAPUsertoSector {
         [PSObject]$List,
         [String]$UserColumnName
     )
-    Write-Host "Initializing ConvertFromListLDAPUsertoDepartment"
+    Write-Host "Function ConvertFromListLDAPUsertoDepartment - Initialized"
     If ($List){
         $List_ConvertFromListLDAPUsertoSector = $List
         $List_ConvertFromListLDAPUsertoSector | ForEach-Object {
             If ($_.$UserColumnName)
             {
-                #$distinguishedname = (Get-ADUser daniellequeiroz).distinguishedname
                 $distinguishedname = (Get-ADUser $_.$UserColumnName).distinguishedname
                 [regex]$domain = ",DC="
                 $distinguishedname = $domain.replace($distinguishedname, ";|", 1)
@@ -117,12 +114,11 @@ Function ConvertFromListLDAPUsertoSector {
                 }
             }
         }
-        Write-Host "ConvertFromPaperCutLog Finished"
         Return $List_ConvertFromListLDAPUsertoSector
     }
     Else {
-        Write-Host "$List not found !"
-        break
+        Write-Host "List $List not found !"
+        #break
     }
 }
 
@@ -149,6 +145,7 @@ Function CreateGraph{
         [String]$Series2AxisXSource,
         [String]$Series2AxisYSource
     )
+    Write-Host "Function CreateGraph $SaveAs - Initialized"
     If ($ChartType -eq ""){$ChartType = "Column"}
     $Chart_PrinterHistory = New-Object System.Windows.Forms.DataVisualization.Charting.Chart
     $Chart_PrinterHistory.Width = $Width
@@ -170,17 +167,20 @@ Function CreateGraph{
     $Chart_PrinterHistoryArea.Area3DStyle.Inclination = 50
     $Chart_PrinterHistoryArea.Area3DStyle.PointDepth = 50
     $Chart_PrinterHistoryArea.Area3DStyle.Rotation = 5
-
     $Chart_PrinterHistory.ChartAreas.Add($Chart_PrinterHistoryArea)
     $Chart_PrinterHistoryArea.AxisX.Title = $TitleAxisX
     $Chart_PrinterHistoryArea.AxisY.Title = $TitleAxisy
     $Chart_PrinterHistoryArea.AxisX.MajorGrid.Enabled = $False
     $Chart_PrinterHistory.font = "100"
-    $Chart_PrinterHistory.Series.Add($Series1Name)
-    $Chart_PrinterHistory.Series.Add($Series2Name)
+
+    #$Chart_PrinterHistory.Series.Add($Series1Name)
+    #$Chart_PrinterHistory.Series.Add($Series2Name)
+
+    $Chart_PrinterHistory.Series.Add($Series1Name) > $null
+    $Chart_PrinterHistory.Series.Add($Series2Name) > $null
+
     $Chart_PrinterHistory.Series[$Series1Name].ChartType = [System.Windows.Forms.DataVisualization.Charting.SeriesChartType]::$ChartType
     $Chart_PrinterHistory.Series[$Series2Name].ChartType = [System.Windows.Forms.DataVisualization.Charting.SeriesChartType]::$ChartType
-
     If ( ($ChartType = "Funnel") -and ($With3D) )
     {
         $Chart_PrinterHistory.Series[$Series2Name].CustomProperties = "Funnel3DDrawingStyle=CircularBase"
@@ -189,7 +189,6 @@ Function CreateGraph{
         $Chart_PrinterHistory.Series[$Series2Name].CustomProperties = "FunnelStyle=YIsHeight"
         $Chart_PrinterHistory.Series[$Series2Name].CustomProperties = "FunnelLabelStyle=Outside"
     }
-
     $Chart_PrinterHistory.Series[$Series1Name].YValueType = [System.Windows.Forms.DataVisualization.Charting.ChartValueType]::Double 
     $Chart_PrinterHistory.Series[$Series2Name].YValueType = [System.Windows.Forms.DataVisualization.Charting.ChartValueType]::Double
     $Chart_PrinterHistory.Series[$Series1Name].Points.DataBindXY($List.$Series1AxisXSource,$List.$Series1AxisYSource)
@@ -211,6 +210,7 @@ Function CreateSNMPList{
         [String]$Printer_Name,
         [Bool]$FirstMonthCheck
     )
+    Write-Host "Function CreateSNMPList on $Printer_Name - Initialized"
     $PrintList | Where-Object Name -eq $Printer_Name | ForEach-Object {
         $SNMP_Counter_copied_BW = GetSNMPValue -IP_Address $_.IP_Address -SNMP_Community $_.SNMP_Community -SNMP_Version $_.SNMP_Version -SNMP_OID $_.SNMP_Counter_copied_BW
         $SNMP_Counter_printed_BW = GetSNMPValue -IP_Address $_.IP_Address -SNMP_Community $_.SNMP_Community -SNMP_Version $_.SNMP_Version -SNMP_OID $_.SNMP_Counter_printed_BW
@@ -241,7 +241,7 @@ Function GetSNMPValue{
         [int]$SNMP_Version,
         [String]$SNMP_OID
     )
-    Write-Host "Initializing GetSNMPValue"
+    Write-Host "  - Function GetSNMPValue ($IP_Address - OID $SNMP_OID ) - Initialized"
     $SNMPValue = $null
     If ($SNMP_OID) {
         $SNMP = New-Object -ComObject olePrn.OleSNMP
@@ -249,7 +249,6 @@ Function GetSNMPValue{
         $SNMPValue = $SNMP.get("."+$SNMP_OID)
         $SNMP.Close()
     }
-    Write-Host "GetSNMPValue Finished"
     return $SNMPValue
 }
 
@@ -262,7 +261,7 @@ Function GetPrinterCost{
         [String]$TotalPrintedInColor,
         [String]$TotalPrintedInBW
     )
-    Write-Host "Initializing GetPrinterCost"
+    Write-Host "Function GetPrinterCost - Initialized"
     $PrinterCost = 0
     $Printer_Rent_Quota = $Printer_Rent_Quota - $TotalPrintedInColor
     If ($Printer_Rent_Quota -ge 0 )
@@ -284,7 +283,6 @@ Function GetPrinterCost{
     }
     $PrinterCost = [Math]::Round( ($TotalPrintedInColor * $Printer_Color_Page_Cost) + ($TotalPrintedInBW * $PrinterBW_Page_Cost) + $Printer_Rent_Value ,2 )
     $PrinterCost = $PrinterCost.ToString('C',[cultureinfo]'pt-BR')
-    Write-Host "GetPrinterCost Finished"
     return $PrinterCost
 }
 
@@ -292,14 +290,13 @@ Function ImportPrintList{
     param(
         [String]$Path
     )
-    Write-Host "Initializing ImportPrintList"
+    Write-Host "Function ImportPrintList - Initialized"
     If (Test-Path -Path $Path){
         $List_ImportPrintList = Import-Csv -Encoding UTF8 -Delimiter ';' $Path
-        Write-Host "ImportPrintList Finished"
         Return $List_ImportPrintList
     }
     Else {
-        Write-Host "$Path not found !"
+        Write-Host "Path for ImportPrintList $Path not found !"
         break
     }
 }
@@ -308,14 +305,13 @@ Function ImportPrinterHistory{
     param(
         [String]$Path
     )
-    Write-Host "Initializing ImportPrinterHistory"
+    Write-Host "Function ImportPrinterHistory - Initialized"
     If (Test-Path -Path $Path) {
         $List_ImportPrinterHistory = Import-Csv -Encoding UTF8 -Delimiter ';' $Path | select -Property @{n='Checked_Date';e={[int]$_.Checked_Date}},@{n='Counter_copied_BW';e={[int]$_.Counter_copied_BW}},@{n='Counter_printed_BW';e={[int]$_.Counter_printed_BW}},@{n='Counter_copied_color';e={[int]$_.Counter_copied_color}},@{n='Counter_printed_color';e={[int]$_.Counter_printed_color}},@{n='TotalBWPrinted';e={[int]$_.TotalBWPrinted}},@{n='TotalColorPrinted';e={[int]$_.TotalColorPrinted}},* -Exclude 'Checked_Date','Counter_copied_BW','Counter_printed_BW','Counter_copied_color','Counter_printed_color','TotalColorPrinted','TotalBWPrinted' 
-        Write-Host "ImportPrinterHistory Finished"
         return $List_ImportPrinterHistory
     }
     Else {
-        Write-Host "$Path not found !"
+        Write-Host "Path for ImportPrinterHistory $Path not found !"
         break
     }
 }
@@ -324,7 +320,7 @@ Function PrinterConsumptionHistory{
     param(
         [PSObject]$List
     )
-    Write-Host "Initializing PrinterConsumptionHistory"
+    Write-Host "Function PrinterConsumptionHistory - Initialized"
     $List_PrinterConsumptionHistory = @()
     [int]$last_check_color = 0
     [int]$last_check_bw = 0
@@ -352,7 +348,6 @@ Function PrinterConsumptionHistory{
         [int]$last_check_bw = [int]$_.TotalBWPrinted
     }
     $List_PrinterConsumptionHistory = $List_PrinterConsumptionHistory | Select-Object -Skip 1 | Select-Object -Last 12
-    Write-Host "PrinterConsumptionHistory Finished"
     return $List_PrinterConsumptionHistory
 }
 
@@ -365,9 +360,22 @@ $LastMonth =  '{0:d2}' -f (Get-Date).date.AddMonths(-1).Month
 $PrintList = ImportPrintList -Path "$DestinationFolder\script\PrintList.csv"
 $PaperCutLogFolder = "C:\Program Files (x86)\PaperCut Print Logger\logs\csv\monthly"
 Clear-Host
+
+Write-Host "Importando histórico de $DestinationFolder\script\history.csv"
+$PrinterHistory = ImportPrinterHistory "$DestinationFolder\script\history.csv"
+Write-Host "Total registros: $($PrinterHistory.Count)"
+
 $PrintList | ForEach-Object {
-    If ((Test-NetConnection $_.IP_Address).PingSucceeded) {
-        $PrinterHistory = ImportPrinterHistory "$DestinationFolder\script\history.csv"
+    $IPAddress = $_.IP_Address
+    sleep 2
+    Write-Host "-----------------------------------------"
+    Write-Host "Colecting PRINTER $IPAddress"
+    Write-Host "-----------------------------------------"
+#    If ((Test-NetConnection $IPAddress).PingSucceeded) {
+    $Timeout = 2  # Defina o tempo máximo de espera em segundos
+    $TestConnectionResult = Test-Connection -ComputerName $IPAddress -Count 1
+    If ($TestConnectionResult.StatusCode -eq 0) {
+#        Write-Host "Connected to $IPAddress" 
         $Name = $_.Name
         $PrinterHistory_FirstMonthCheck = $PrinterHistory | Where-Object { $_.Printer_Name -eq $Name -AND $_.FirstMonthCheck -eq "True" }
         If ($PrinterHistory_FirstMonthCheck | Where-Object { $_.Checked_Date -ge [int]("$ThisYear"+"$ThisMonth"+"00") })
@@ -383,8 +391,8 @@ $PrintList | ForEach-Object {
         $SNMP_List = CreateSNMPList -Printer_Name $Name -FirstMonthCheck $Save_PerMouth_History
         $SNMP_List | Select "FirstMonthCheck","Checked_Date","Printer_Name","Counter_copied_BW","Counter_printed_BW","Counter_copied_color","Counter_printed_color","TotalBWPrinted","TotalColorPrinted" | Export-Csv -NoTypeInformation -Encoding UTF8 -Delimiter ';' "$DestinationFolder\script\history.csv" –Append
         $PaperCutLog = ConvertFromPaperCutLog -PaperCutLogFile "$PaperCutLogFolder\$PaperCutFile" -PrinterName $Name
-        $PaperCutLog = ConvertFromListLDAPUsertoSector -List $PaperCutLog -UserColumnName "User"
-        $PaperCutLog = CalculateTotalsOfAnList -List $PaperCutLog -Unique "User"
+        If ($PaperCutLog) {$PaperCutLog = ConvertFromListLDAPUsertoSector -List $PaperCutLog -UserColumnName "User"}
+        If ($PaperCutLog) {$PaperCutLog = CalculateTotalsOfAnList -List $PaperCutLog -Unique "User"}
         $PrinterConsumption = $null
         $PrinterConsumption = New-Object PSObject
         Add-Member -inputObject $PrinterConsumption -memberType NoteProperty -name "User" -value "Printer"
@@ -392,6 +400,10 @@ $PrintList | ForEach-Object {
         $PrintedInColor = $null
         $PrintedInBW = $( $($SNMP_List.TotalBWPrinted-$PrinterHistory_FirstMonthCheck[-1].TotalBWPrinted)+$($SNMP_List.Counter_copied_BW-$PrinterHistory_FirstMonthCheck[-1].Counter_copied_BW)-$($PaperCutLog | Measure-Object "PrintedInBW" -Sum).Sum)
         $PrintedInColor = $( $($SNMP_List.TotalColorPrinted-$PrinterHistory_FirstMonthCheck[-1].TotalColorPrinted)+$($SNMP_List.Counter_copied_color-$PrinterHistory_FirstMonthCheck[-1].Counter_copied_color)-$($PaperCutLog | Measure-Object "PrintedInColor" -Sum).Sum)
+        If ($PrintedInBW -lt 0)
+        {
+            $PrintedInBW=0
+        }
         If ($PrintedInColor -lt 0)
         {
             If ($($PrintedInBW+$PrintedInColor) -gt 0)
@@ -430,9 +442,11 @@ $PrintList | ForEach-Object {
             $GraphMontlyFileName = "$Name`_Chart_PerSector"
             $TitleAxisX = "The estimated Printer Cost (until now) is - $PrinterMountlyCost"
         }
-        CreateGraph -List $PaperCutLog -SaveAs "$DestinationFolder\assets\images\$GraphMontlyFileName.png" -Width 1500 -Height 500 -MainTitle "$Name - Consumption PerSector - $(get-date -Format "dd/MM/yyyy")" -TitleAxisX $TitleAxisX -TitleAxisY "Pages" -Series1Name "BlackAndWhite" -Series1Color "#000000" -Series1AxisXSource "User" -Series1AxisYSource "PrintedInBW" -Series2Name "Color" -Series2Color "#62B5CC" -Series2AxisXSource "User" -Series2AxisYSource "PrintedInColor" -ChartType "Column" -WithLegendOn "Right"
-        CreateGraph -List $PaperCutLog -SaveAs "$DestinationFolder\assets\images\History-$Name`_$(get-date -Format "yyyy_MM").png" -Width 1500 -Height 500 -MainTitle "$Name - Consumption PerSector - $(get-date -Format "dd/MM/yyyy")" -TitleAxisX "Sectors" -TitleAxisY "Pages" -Series1Name "BlackAndWhite" -Series1Color "#000000" -Series1AxisXSource "User" -Series1AxisYSource "PrintedInBW" -Series2Name "Color" -Series2Color "#62B5CC" -Series2AxisXSource "User" -Series2AxisYSource "PrintedInColor" -ChartType "Column" -WithLegendOn "Right"
+        Write-host "3 1- $PaperCutLog 2- $DestinationFolder 3- $GraphMontlyFileName 4- $Name 5- $TitleAxisX "
+        try { CreateGraph -List $PaperCutLog -SaveAs "$DestinationFolder\assets\images\$GraphMontlyFileName.png" -Width 1500 -Height 500 -MainTitle "$Name - Consumption PerSector - $(get-date -Format "dd/MM/yyyy")" -TitleAxisX $TitleAxisX -TitleAxisY "Pages" -Series1Name "BlackAndWhite" -Series1Color "#000000" -Series1AxisXSource "User" -Series1AxisYSource "PrintedInBW" -Series2Name "Color" -Series2Color "#62B5CC" -Series2AxisXSource "User" -Series2AxisYSource "PrintedInColor" -ChartType "Column" -WithLegendOn "Right" } catch { Write-Host "Cant generate a graph" }
+        try { CreateGraph -List $PaperCutLog -SaveAs "$DestinationFolder\assets\images\History-$Name`_$(get-date -Format "yyyy_MM").png" -Width 1500 -Height 500 -MainTitle "$Name - Consumption PerSector - $(get-date -Format "dd/MM/yyyy")" -TitleAxisX "Sectors" -TitleAxisY "Pages" -Series1Name "BlackAndWhite" -Series1Color "#000000" -Series1AxisXSource "User" -Series1AxisYSource "PrintedInBW" -Series2Name "Color" -Series2Color "#62B5CC" -Series2AxisXSource "User" -Series2AxisYSource "PrintedInColor" -ChartType "Column" -WithLegendOn "Right"  } catch { Write-Host "Cant generate a graph" }
     }
+    Else {Write-Host "ERROR - No connetion to $IPAddress" }
 }
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
