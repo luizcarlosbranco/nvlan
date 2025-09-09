@@ -1,0 +1,69 @@
+upstream pool_NOMEHOST.DOMAIN {
+        least_conn;
+        server IPADDRESS fail_timeout=30s max_fails=3 max_conns=500;
+        keepalive                       16;
+}
+
+server {
+        if ($host = NOMEHOST.DOMAIN) {
+                return 301 https://$host$request_uri;
+        }
+        listen                          80;
+        server_name                     NOMEHOST.DOMAIN;
+        return 301 https://$host$request_uri;
+}
+
+server {
+        listen                          443 ssl;
+        server_name                     NOMEHOST.DOMAIN;
+        charset                         utf-8;
+        access_log                      /var/log/nginx/NOMEHOST.DOMAIN.access.log main;
+        error_log                       /var/log/nginx/NOMEHOST.DOMAIN.error.log;
+
+#       include                         /etc/nginx/restrict_ips.conf;
+        limit_conn                      limitconnbyaddr 50;
+        include                         /etc/nginx/proxy_default.conf;
+        include                         /etc/nginx/certificados/DOMAIN.conf;
+
+        proxy_set_header                Host $host;
+        proxy_set_header                X-REQUEST_URI $request_uri;
+#       proxy_set_header                X-Forwarded-ssl on;
+
+        #SE WORDPRESS, INVERTA
+        proxy_set_header                X-Forwarded-Proto $scheme;
+        #proxy_set_header               X-Forwarded-Proto https;
+        #proxy_set_header               X-Forwarded-Port 443;
+
+        client_max_body_size            90m;
+
+        include                         /etc/nginx/security_headers.conf;
+        include                         /etc/nginx/proxy_blacklist.conf;
+
+        location / {
+                default_type            text/html;
+                proxy_redirect          off;
+
+                #SE WORDPRESS, INVERTA
+                proxy_set_header        Host $http_host;
+                proxy_set_header        X-Forwarded-Host $host;
+                proxy_set_header        X-Forwarded-Server $host;
+                proxy_set_header        X-Real-IP $remote_addr;
+                proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_http_version      1.1;
+                proxy_set_header        Connection "";
+                proxy_pass              http://pool_NOMEHOST.DOMAIN;
+                #proxy_pass              http://pool_NOMEHOST.DOMAIN$request_uri;
+
+                client_max_body_size    90m;
+                server_name_in_redirect on;
+        }
+
+        #SE WORDPRESS, DESCOMENTE
+        #location /admin {
+        #       include /etc/nginx/restrict_ips.conf;
+        #       default_type            text/html;
+        #       proxy_redirect          off;
+        #       proxy_pass              http://pool_NOMEHOST.DOMAIN$request_uri;
+        #       server_name_in_redirect on;
+        #}
+}
