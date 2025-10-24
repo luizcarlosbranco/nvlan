@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organograma Moderno - Novo Formato de Dados</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <style>
+        /* ============================================== */
+        /* ESTILOS PARA FORÇAR O TAMANHO FIXO DO NÓ */
+        /* ============================================== */
+        
+        .google-visualization-orgchart-node {
+            max-width: 200px !important; 
+            min-width: 200px !important;
+            height: 70px !important; 
+            
+            border: none !important; 
+            background-color: transparent !important;
+            padding: 0 !important;
+            box-shadow: none !important; 
+        }
+
+        .google-visualization-orgchart-selected {
+            background-color: transparent !important;
+            border: none !important;
+        }
+
+        .google-visualization-orgchart-line,
+        .google-visualization-orgchart-table * {
+            background-color: transparent !important;
+        }
+
+        .google-visualization-orgchart-table {
+            border-collapse: separate;
+            border-spacing: 5px; 
+        }
+
+
+        /* ============================================== */
+        /* ESTILOS DO NÓ CUSTOMIZADO (Seu Conteúdo) */
+        /* ============================================== */
+        .modern-node {
+            display: flex;
+            align-items: center;
+            width: 100%; 
+            height: 100%;
+            padding: 10px;
+            border-radius: 8px; 
+            background-color: #f8f9fa; 
+            text-align: left;
+            border: 1px solid #ced4da;
+            transition: all 0.2s ease;
+            cursor: pointer; 
+        }
+        
+        .modern-node:hover {
+            background-color: #e9ecef; 
+            border-color: #007bff; 
+        }
+        
+        .node-selected {
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+        }
+
+        .node-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%; 
+            object-fit: cover;
+            margin-right: 10px;
+            border: 2px solid #007bff; 
+            flex-shrink: 0; 
+        }
+
+        .node-info {
+            line-height: 1.2;
+            overflow: hidden;
+            flex-grow: 1;
+        }
+
+        .node-name {
+            font-weight: bold;
+            color: #343a40;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 1rem;
+        }
+
+        .node-title {
+            color: #6c757d;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container mt-5">	
+        <div id="orgchart_div" class="d-flex justify-content-center"></div>
+    </div>
+    <div class="modal fade" id="employeeDetailsModal" tabindex="-1" aria-labelledby="employeeDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="employeeDetailsModalLabel">Ficha do Colaborador</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <img id="modal_avatar" src="" alt="Avatar" class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;">
+                        <h4 id="modal_name"></h4>
+                        <p class="text-muted" id="modal_title"></p>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Tags:</strong> <span id="modal_tags"></span></li>
+                        <li class="list-group-item"><strong>E-mail:</strong> <span id="modal_email"></span></li>
+                        <li class="list-group-item"><strong>Telefone:</strong> <span id="modal_phone"></span></li>
+                        <li class="list-group-item"><strong>LinkedIn:</strong> <span id="modal_linkedin">N/A</span></li> 
+                        <li class="list-group-item"><strong>ID:</strong> <span id="modal_id"></span></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // 1. NOVO FORMATO DE DADOS DOS COLABORADORES
+        const teamData = [
+            // id | pid (Parent ID) | tags | name | Title | Phone | Email | img
+//NodeList
+        ];
+
+        // 2. IMAGEM PADRÃO DEFINIDA AQUI
+        const defaultAvatar = 'https://via.placeholder.com/50/CCCCCC/FFFFFF?text=AV'; 
+
+        google.charts.load('current', { packages: ['orgchart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        // 3. FUNÇÃO QUE CONSTRÓI O NÓ (USANDO name, Title, img)
+        function getCustomNodeHtml(member) {
+            // Lógica de fallback: se member.img for vazia (''), usa defaultAvatar.
+            const photoUrl = member.img || defaultAvatar; 
+            
+            return `<div class="modern-node" data-member-id="${member.id}">
+                        <img src="${photoUrl}" alt="${member.name}" class="node-avatar">
+                        <div class="node-info">
+                            <div class="node-name">${member.name}</div>
+                            <div class="node-title">${member.Title}</div>
+                        </div>
+                    </div>`;
+        }
+
+        function drawChart() {
+            const data = new google.visualization.DataTable();
+            
+            // Colunas: ID do Nó | ID do Pai | Tooltip (Opcional)
+            data.addColumn('string', 'Nome');
+            data.addColumn('string', 'Pai');
+            data.addColumn('string', 'Tooltip');
+            
+            // Mapear os dados do array para o formato DataTable
+            const dataRows = teamData.map(member => {
+                // A célula do "Nome" contém o HTML customizado
+                const nodeContent = {
+                    v: member.id, // ID
+                    f: getCustomNodeHtml(member) // HTML customizado
+                };
+                
+                // Retorna o formato [NodeContent, ParentID, Tooltip]
+                // Se não tiver PID, assume a raiz (passa '' ou null)
+                const parentId = member.pid || ''; 
+                const tooltip = `${member.name} - ${member.Title}`;
+
+                return [nodeContent, parentId, tooltip];
+            });
+
+            data.addRows(dataRows);
+
+            const options = {
+                'allowHtml': true,
+                'allowCollapse': true,
+                'size': 'medium'
+            };
+
+            const chart = new google.visualization.OrgChart(document.getElementById('orgchart_div'));
+
+            let selectedNodeElement = null;
+
+            google.visualization.events.addListener(chart, 'select', function() {
+                const selection = chart.getSelection();
+                
+                // Limpa a classe de seleção CSS anterior
+                if (selectedNodeElement) {
+                    selectedNodeElement.classList.remove('node-selected');
+                }
+
+                if (selection.length > 0) {
+                    const rowIndex = selection[0].row;
+                    const memberId = data.getValue(rowIndex, 0); 
+                    
+                    // Encontra o objeto do membro no array original
+                    const member = teamData.find(m => m.id === memberId);
+                    
+                    if (member) {
+                        // Aplica o estilo de seleção customizado
+                        const nodeCell = chart.getContainer().querySelector(`[data-member-id="${memberId}"]`);
+                        if (nodeCell) {
+                            nodeCell.classList.add('node-selected');
+                            selectedNodeElement = nodeCell;
+                        }
+
+                        showMemberModal(member);
+                    }
+                }
+            });
+
+            chart.draw(data, options);
+        }
+
+        // 4. FUNÇÃO PARA EXIBIR O MODAL (USANDO name, Title, Phone, Email, img, tags)
+        function showMemberModal(member) {
+            // Preenche o modal com os dados do novo formato
+            document.getElementById('modal_avatar').src = member.img || defaultAvatar;
+            document.getElementById('modal_name').innerText = member.name;
+            document.getElementById('modal_title').innerText = member.Title;
+            document.getElementById('modal_email').innerText = member.Email;
+            document.getElementById('modal_phone').innerText = member.Phone;
+            document.getElementById('modal_tags').innerText = member.tags ? member.tags.join(', ') : 'N/A';
+            document.getElementById('modal_id').innerText = member.id;
+            
+            // LinkedIn não está no novo array, então preenchemos com N/A
+            document.getElementById('modal_linkedin').innerText = 'N/A';
+
+
+            const modalElement = document.getElementById('employeeDetailsModal');
+            const memberModal = new bootstrap.Modal(modalElement);
+            memberModal.show();
+        }
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

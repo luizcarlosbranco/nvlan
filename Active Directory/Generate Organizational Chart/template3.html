@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organograma da Empresa</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container-fluid {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .navbar-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-section h1 {
+            color: white;
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            flex: 1;
+            width: 100%;
+        }
+
+        .nodes-container {
+            position: relative;
+            display: inline-block;
+            padding: 0;
+        }
+
+        .org-node {
+            position: absolute;
+            cursor: pointer;
+        }
+
+        .node-card {
+            width: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .node-card.assistant {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .node-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .node-image {
+            width: 100%;
+            height: 150px;
+            background: #ddd;
+            overflow: hidden;
+        }
+
+        .node-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .node-info {
+            padding: 10px;
+            background: white;
+            font-size: 12px;
+        }
+
+        .node-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .node-name-banner {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .line {
+            stroke: #999;
+            stroke-width: 2;
+            fill: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="navbar-section">
+            <h1>Organograma da Empresa</h1>
+        </div>
+        <div class="chart-wrapper">
+            <div class="nodes-container" id="nodesContainer"></div>
+        </div>
+    </div>
+
+    <!-- Modal Bootstrap -->
+    <div class="modal fade" id="employeeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalName"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <img id="modalImage" src="" alt="img" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-8">
+                            <p class="text-primary fw-bold mb-2" id="modalTitle"></p>
+                            <div id="modalContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Imagem padrão em base64 (avatar genérico)
+        const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTBFN0ZGIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjcwIiByPSI0MCIgZmlsbD0iIzY2N2VlYSIvPgo8cGF0aCBkPSJNIDUwIDE1MCBRIDUwIDEyMCA3NSAxMDUgUSAxMDAgOTUgMTI1IDEwNSBRIDE1MCAxMjAgMTUwIDE1MCBaIiBmaWxsPSIjNjY3ZWVhIi8+Cjwvc3ZnPg==';
+    
+        class OrgChart {
+            constructor(containerId, dataSource, layoutConfig = {}) {
+                this.container = document.getElementById(containerId);
+                this.dataSource = dataSource;
+                this.layoutConfig = layoutConfig;
+                this.nodeElements = {};
+                this.positions = {};
+                this.modalInstance = new bootstrap.Modal(document.getElementById('employeeModal'));
+                this.render();
+            }
+
+            getLayoutForLevel(level) {
+                if (this.layoutConfig[level]) {
+                    return this.layoutConfig[level];
+                }
+
+                let lastLayout = 'horizontal';
+                for (let i = level - 1; i >= 0; i--) {
+                    if (this.layoutConfig[i]) {
+                        lastLayout = this.layoutConfig[i];
+                        break;
+                    }
+                }
+                return lastLayout;
+            }
+
+            render() {
+                this.container.innerHTML = '';
+                this.nodeElements = {};
+                this.positions = {};
+
+                const nodeMap = new Map(this.dataSource.map(node => [node.id, node]));
+
+                // Separar assistentes dos nós normais
+                const assistants = this.dataSource.filter(node => node.tags && node.tags.includes('assistant'));
+                const normalNodes = this.dataSource.filter(node => !node.tags || !node.tags.includes('assistant'));
+
+                const levelMap = new Map();
+                const visited = new Set();
+
+                const getLevel = (nodeId) => {
+                    if (visited.has(nodeId)) return levelMap.get(nodeId) || 0;
+                    visited.add(nodeId);
+
+                    const node = nodeMap.get(nodeId);
+                    if (!node || !node.pid) {
+                        levelMap.set(nodeId, 0);
+                        return 0;
+                    }
+
+                    const parentLevel = getLevel(node.pid);
+                    const level = parentLevel + 1;
+                    levelMap.set(nodeId, level);
+                    return level;
+                };
+
+                // Calcular níveis para nós normais
+                normalNodes.forEach(node => {
+                    getLevel(node.id);
+                });
+
+                // Para assistentes, eles ficam no mesmo nível do pai
+                //assistants.forEach(node => {
+                //    if (node.pid) {
+                //        const parentLevel = levelMap.get(node.pid) || 0;
+                //        levelMap.set(node.id, -1); // Nível especial para assistentes
+                //    }
+                //});
+
+                const levelNodes = new Map();
+                levelMap.forEach((level, nodeId) => {
+                    if (!levelNodes.has(level)) levelNodes.set(level, []);
+                    levelNodes.get(level).push(nodeId);
+                });
+
+                const nodeWidth = 200;
+                const nodeHeight = 220;
+                const horizontalGap = 40;
+                const verticalGap = 20;
+                //const assistantSeparation = 80; // Distância horizontal dos assistentes
+
+                let globalYOffset = 0;
+
+                // Primeiro renderizar nós normais
+                levelNodes.forEach((nodeIds, level) => {
+                    if (level === -1) return; // Pular assistentes por enquanto
+
+                    const layout = this.getLayoutForLevel(level);
+                    const normalLevelNodes = nodeIds.filter(id => !assistants.find(a => a.id === id));
+
+                    if (normalLevelNodes.length === 0) return;
+
+                    if (layout === 'horizontal') {
+                        const totalWidth = normalLevelNodes.length * (nodeWidth + horizontalGap);
+                        let x = -totalWidth / 2;
+
+                        normalLevelNodes.forEach(nodeId => {
+                            this.positions[nodeId] = {
+                                x: x,
+                                y: globalYOffset
+                            };
+                            x += nodeWidth + horizontalGap;
+                        });
+
+                        globalYOffset += nodeHeight + verticalGap;
+
+                    } else if (layout === 'vertical-1') {
+                        normalLevelNodes.forEach((nodeId, index) => {
+                            this.positions[nodeId] = {
+                                x: 0,
+                                y: globalYOffset + index * (nodeHeight + verticalGap)
+                            };
+                        });
+
+                        globalYOffset += normalLevelNodes.length * (nodeHeight + verticalGap);
+
+                    } else if (layout === 'vertical-2') {
+                        const columns = 2;
+
+                        normalLevelNodes.forEach((nodeId, index) => {
+                            const row = Math.floor(index / columns);
+                            const col = index % columns;
+
+                            const posX = col * (nodeWidth + horizontalGap) - (columns - 1) * (nodeWidth + horizontalGap) / 2;
+                            const posY = globalYOffset + row * (nodeHeight + verticalGap);
+
+                            this.positions[nodeId] = {
+                                x: posX,
+                                y: posY
+                            };
+                        });
+
+                        const rowsCount = Math.ceil(normalLevelNodes.length / columns);
+                        globalYOffset += rowsCount * (nodeHeight + verticalGap);
+                    }
+                });
+
+                // Posicionar assistentes ao lado de seus pais
+                //assistants.forEach(assistant => {
+                //    const parentPos = this.positions[assistant.pid];
+                //    if (parentPos) {
+                //        // Posicionar assistente entre o pai e o nível abaixo
+                //        const betweenY = parentPos.y + nodeHeight + (verticalGap / 2);
+                //        this.positions[assistant.id] = {
+                //            x: parentPos.x,
+                //            y: betweenY
+                //        };
+                //    }
+                //});
+
+                this.drawConnections();
+
+                this.dataSource.forEach(node => {
+                    this.createNodeElement(node);
+                });
+            }
+
+            drawConnections() {
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                
+                const nodeWidth = 200;
+                const nodeHeight = 220;
+
+                const allPositions = Object.values(this.positions);
+                if (allPositions.length === 0) return;
+
+                const minX = Math.min(...allPositions.map(p => p.x));
+                const maxX = Math.max(...allPositions.map(p => p.x)) + nodeWidth;
+                const minY = Math.min(...allPositions.map(p => p.y)) - 100;
+                const maxY = Math.max(...allPositions.map(p => p.y)) + nodeHeight + 100;
+
+                const width = maxX - minX;
+                const height = maxY - minY;
+
+                svg.setAttribute('width', width);
+                svg.setAttribute('height', height);
+                svg.setAttribute('viewBox', `${minX} ${minY} ${width} ${height}`);
+                svg.style.position = 'absolute';
+                svg.style.top = minY + 'px';
+                svg.style.left = minX + 'px';
+
+                this.dataSource.forEach(node => {
+                    if (node.pid) {
+                        const parentPos = this.positions[node.pid];
+                        const childPos = this.positions[node.id];
+
+                        if (parentPos && childPos) {
+                            // Ponto de saída do parent (abaixo da caixa)
+                            const x1 = parentPos.x + nodeWidth / 2;
+                            const y1 = parentPos.y + nodeHeight;
+                            
+                            // Ponto de chegada do child (acima da caixa)
+                            const x2 = childPos.x + nodeWidth / 2;
+                            const y2 = childPos.y;
+
+                            // Ponto médio (entre os dois níveis)
+                            const gap = (y2 - y1) / 2;
+                            const midY = y1 + gap;
+
+                            // Desenhar a linha em formato L
+                            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                            path.setAttribute('d', `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`);
+                            path.setAttribute('class', 'line');
+                            svg.appendChild(path);
+                        }
+                    }
+                });
+
+                this.container.appendChild(svg);
+            }
+
+            createNodeElement(node) {
+                const pos = this.positions[node.id];
+                if (!pos) return;
+
+                const nodeDiv = document.createElement('div');
+                nodeDiv.className = 'org-node';
+                nodeDiv.style.left = pos.x + 'px';
+                nodeDiv.style.top = pos.y + 'px';
+                nodeDiv.style.zIndex = '2';
+
+                const card = document.createElement('div');
+                card.className = 'node-card';
+                
+                // Adicionar classe assistant se o nó tiver a tag
+                //if (node.tags && node.tags.includes('assistant')) {
+                //    card.classList.add('assistant');
+                //}
+
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'node-image';
+                const img = document.createElement('img');
+                img.src = node.img || DEFAULT_AVATAR;
+                imageDiv.appendChild(img);
+
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'node-info';
+
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'node-title';
+                titleDiv.textContent = node.title;
+                infoDiv.appendChild(titleDiv);
+
+                const nameBanner = document.createElement('div');
+                nameBanner.className = 'node-name-banner';
+                nameBanner.textContent = node.name;
+
+                card.appendChild(imageDiv);
+                card.appendChild(infoDiv);
+                nodeDiv.appendChild(nameBanner);
+                nodeDiv.appendChild(card);
+
+                nodeDiv.addEventListener('click', () => this.openModal(node));
+
+                this.container.appendChild(nodeDiv);
+                this.nodeElements[node.id] = nodeDiv;
+            }
+
+            openModal(node) {
+                document.getElementById('modalImage').src = node.img || DEFAULT_AVATAR;
+                document.getElementById('modalName').textContent = node.name;
+                document.getElementById('modalTitle').textContent = node.title;
+
+                const modalContent = document.getElementById('modalContent');
+                modalContent.innerHTML = '';
+
+                const excludeFields = ['id', 'name', 'title', 'img', 'pid'];
+                Object.entries(node).forEach(([key, value]) => {
+                    if (!excludeFields.includes(key) && value) {
+                        const fieldDiv = document.createElement('div');
+                        fieldDiv.className = 'mb-2';
+                        
+                        const label = document.createElement('small');
+                        label.className = 'text-muted fw-bold';
+                        label.textContent = this.formatLabel(key);
+                        
+                        const fieldValue = document.createElement('p');
+                        fieldValue.className = 'mb-0';
+                        fieldValue.textContent = value;
+                        
+                        fieldDiv.appendChild(label);
+                        fieldDiv.appendChild(fieldValue);
+                        modalContent.appendChild(fieldDiv);
+                    }
+                });
+
+                this.modalInstance.show();
+            }
+
+            formatLabel(key) {
+                return key
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, str => str.toUpperCase())
+                    .trim();
+            }
+        }
+
+        const employees = [
+//NodeList
+        ];
+
+        const layoutConfig = {
+            0: 'horizontal',
+            1: 'horizontal',
+            2: 'vertical-2'
+        };
+
+        new OrgChart('nodesContainer', employees, layoutConfig);
+    </script>
+</body>
+</html>

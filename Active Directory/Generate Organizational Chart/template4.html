@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organogram</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container-fluid {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .navbar-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-section h1 {
+            color: white;
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            overflow: auto;
+            flex: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .nodes-container {
+            position: relative;
+            display: inline-block;
+            padding: 50px;
+            transform-origin: center;
+			left: -6%;
+        }
+
+        .org-node {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .org-node:hover {
+            transform: translateY(-3px);
+            z-index: 100 !important;
+        }
+
+        .node-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            width: 280px;
+            height: 70px;
+        }
+
+        .org-node:hover .node-card {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .node-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 3px solid white;
+            background: #ddd;
+        }
+
+        .node-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .node-info {
+            flex: 1;
+            margin-left: 12px;
+            color: white;
+            overflow: hidden;
+        }
+
+        .node-name {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .node-title {
+            font-size: 11px;
+            opacity: 0.95;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .line {
+            stroke: #667eea;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .employee-photo-modal {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid #667eea;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .info-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #667eea;
+            display: block;
+            margin-bottom: 3px;
+            font-size: 12px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .info-value a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+	
+		<div class="chart-wrapper">
+			<div class="nodes-container" id="nodesContainer"></div>
+		</div>
+
+		
+    </div>
+
+    <div class="modal fade" id="employeeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalName"></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="modalImage" src="" alt="Foto" class="employee-photo-modal">
+                    <div id="modalContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const DEFAULT_AVATAR = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+    
+        class OrgChart {
+            constructor(containerId, dataSource) {
+                this.container = document.getElementById(containerId);
+                this.dataSource = dataSource;
+                this.nodeElements = {};
+                this.positions = {};
+                this.modalInstance = new bootstrap.Modal(document.getElementById('employeeModal'));
+                this.render();
+            }
+
+            render() {
+                this.container.innerHTML = '';
+                this.nodeElements = {};
+                this.positions = {};
+
+                const nodeMap = new Map(this.dataSource.map(node => [node.id, node]));
+                const levelMap = new Map();
+                const visited = new Set();
+
+                const getLevel = (nodeId) => {
+                    if (visited.has(nodeId)) return levelMap.get(nodeId) || 0;
+                    visited.add(nodeId);
+
+                    const node = nodeMap.get(nodeId);
+                    if (!node || !node.pid) {
+                        levelMap.set(nodeId, 0);
+                        return 0;
+                    }
+
+                    const parentLevel = getLevel(node.pid);
+                    const level = parentLevel + 1;
+                    levelMap.set(nodeId, level);
+                    return level;
+                };
+
+                this.dataSource.forEach(node => getLevel(node.id));
+
+                const levelNodes = new Map();
+                levelMap.forEach((level, nodeId) => {
+                    if (!levelNodes.has(level)) levelNodes.set(level, []);
+                    levelNodes.get(level).push(nodeId);
+                });
+
+                const nodeWidth = 280;
+                const nodeHeight = 70;
+                const horizontalGap = 30;
+                const verticalGap = 80;
+                const verticalGapSmall = 20;
+                let globalYOffset = 0;
+
+                levelNodes.forEach((nodeIds, level) => {
+                    if (level <= 1) {
+                        // Níveis 0 e 1: layout horizontal (tree tradicional)
+                        const totalWidth = nodeIds.length * (nodeWidth + horizontalGap) - horizontalGap;
+                        let x = -totalWidth / 2;
+
+                        nodeIds.forEach(nodeId => {
+                            this.positions[nodeId] = {
+                                x: x,
+                                y: globalYOffset,
+                                width: nodeWidth,
+                                height: nodeHeight
+                            };
+                            x += nodeWidth + horizontalGap;
+                        });
+
+                        globalYOffset += nodeHeight + verticalGap;
+                    } else {
+                        // Nível 2+: layout vertical (empilhado por gerente)
+                        const nodeMap = new Map(this.dataSource.map(n => [n.id, n]));
+                        
+                        // Agrupar nós do nível atual por seu gerente
+                        const nodesByManager = new Map();
+                        nodeIds.forEach(nodeId => {
+                            const node = nodeMap.get(nodeId);
+                            if (node && node.pid) {
+                                if (!nodesByManager.has(node.pid)) {
+                                    nodesByManager.set(node.pid, []);
+                                }
+                                nodesByManager.get(node.pid).push(nodeId);
+                            }
+                        });
+
+                        // Ordenar gerentes pela posição X (da esquerda para direita)
+                        const sortedManagers = Array.from(nodesByManager.keys())
+                            .filter(managerId => this.positions[managerId])
+                            .sort((a, b) => this.positions[a].x - this.positions[b].x);
+
+                        let maxYInLevel = globalYOffset;
+
+                        sortedManagers.forEach(managerId => {
+                            const managerPos = this.positions[managerId];
+                            const teamMembers = nodesByManager.get(managerId);
+                            
+                            // Posicionar membros da equipe verticalmente abaixo do gerente
+                            let currentY = globalYOffset;
+                            teamMembers.forEach(memberId => {
+                                this.positions[memberId] = {
+                                    x: managerPos.x,
+                                    y: currentY,
+                                    width: nodeWidth,
+                                    height: nodeHeight
+                                };
+                                currentY += nodeHeight + verticalGapSmall;
+                            });
+
+                            // Atualizar o Y máximo deste nível
+                            if (currentY > maxYInLevel) {
+                                maxYInLevel = currentY;
+                            }
+                        });
+
+                        globalYOffset = maxYInLevel - verticalGapSmall + verticalGap;
+                    }
+                });
+
+                this.drawConnections();
+
+                this.dataSource.forEach(node => {
+                    this.createNodeElement(node);
+                });
+
+                // Centralizar e ajustar zoom
+                this.adjustViewport();
+            }
+
+            drawConnections() {
+                const allPositions = Object.values(this.positions);
+                if (allPositions.length === 0) return;
+
+                const minX = Math.min(...allPositions.map(p => p.x));
+                const maxX = Math.max(...allPositions.map(p => p.x + p.width));
+                const minY = Math.min(...allPositions.map(p => p.y));
+                const maxY = Math.max(...allPositions.map(p => p.y + p.height));
+
+                const width = maxX - minX + 200;
+                const height = maxY - minY + 200;
+
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('width', width);
+                svg.setAttribute('height', height);
+                svg.style.left = (minX - 100) + 'px';
+                svg.style.top = (minY - 100) + 'px';
+
+                // Agrupar filhos por pai
+                const childrenByParent = new Map();
+                this.dataSource.forEach(node => {
+                    if (node.pid) {
+                        if (!childrenByParent.has(node.pid)) {
+                            childrenByParent.set(node.pid, []);
+                        }
+                        childrenByParent.get(node.pid).push(node.id);
+                    }
+                });
+
+                // Desenhar conexões para cada pai
+                childrenByParent.forEach((children, parentId) => {
+                    const parentPos = this.positions[parentId];
+                    if (!parentPos) return;
+
+                    const parentCenterX = parentPos.x + parentPos.width / 2 - minX + 100;
+                    const parentBottomY = parentPos.y + parentPos.height - minY + 100;
+
+                    if (children.length === 1) {
+                        // Se houver apenas um filho, linha direta
+                        const childPos = this.positions[children[0]];
+                        if (!childPos) return;
+
+                        const childCenterX = childPos.x + childPos.width / 2 - minX + 100;
+                        const childTopY = childPos.y - minY + 100;
+                        const midY = (parentBottomY + childTopY) / 2;
+
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', `M ${parentCenterX} ${parentBottomY} L ${parentCenterX} ${midY} L ${childCenterX} ${midY} L ${childCenterX} ${childTopY}`);
+                        path.setAttribute('class', 'line');
+                        svg.appendChild(path);
+                    } else {
+                        // Se houver múltiplos filhos, linha horizontal conectando todos
+                        const childPositions = children
+                            .map(childId => this.positions[childId])
+                            .filter(pos => pos);
+
+                        if (childPositions.length === 0) return;
+
+                        const leftmostChild = Math.min(...childPositions.map(p => p.x + p.width / 2));
+                        const rightmostChild = Math.max(...childPositions.map(p => p.x + p.width / 2));
+                        const childrenY = childPositions[0].y;
+                        const midY = (parentBottomY + (childrenY - minY + 100)) / 2;
+
+                        // Linha vertical do pai até o meio
+                        const verticalLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        verticalLine.setAttribute('d', `M ${parentCenterX} ${parentBottomY} L ${parentCenterX} ${midY}`);
+                        verticalLine.setAttribute('class', 'line');
+                        svg.appendChild(verticalLine);
+
+                        // Linha horizontal conectando todos os filhos
+                        const horizontalLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        horizontalLine.setAttribute('d', `M ${leftmostChild - minX + 100} ${midY} L ${rightmostChild - minX + 100} ${midY}`);
+                        horizontalLine.setAttribute('class', 'line');
+                        svg.appendChild(horizontalLine);
+
+                        // Linhas verticais de cada filho até a linha horizontal
+                        children.forEach(childId => {
+                            const childPos = this.positions[childId];
+                            if (!childPos) return;
+
+                            const childCenterX = childPos.x + childPos.width / 2 - minX + 100;
+                            const childTopY = childPos.y - minY + 100;
+
+                            const childVertical = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                            childVertical.setAttribute('d', `M ${childCenterX} ${midY} L ${childCenterX} ${childTopY}`);
+                            childVertical.setAttribute('class', 'line');
+                            svg.appendChild(childVertical);
+                        });
+                    }
+                });
+
+                this.container.appendChild(svg);
+            }
+
+            createNodeElement(node) {
+                const pos = this.positions[node.id];
+                if (!pos) return;
+
+                const nodeDiv = document.createElement('div');
+                nodeDiv.className = 'org-node';
+                nodeDiv.style.left = pos.x + 'px';
+                nodeDiv.style.top = pos.y + 'px';
+                nodeDiv.style.zIndex = '10';
+
+                const card = document.createElement('div');
+                card.className = 'node-card';
+
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'node-image';
+                const img = document.createElement('img');
+                img.src = node.img || DEFAULT_AVATAR;
+                img.alt = node.name;
+                imageDiv.appendChild(img);
+
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'node-info';
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'node-name';
+                nameDiv.textContent = node.name;
+                nameDiv.title = node.name;
+
+				const titleDiv = document.createElement('div');
+				titleDiv.className = 'node-title';
+				titleDiv.textContent = node.Title;
+				titleDiv.title = node.Title;
+
+                infoDiv.appendChild(nameDiv);
+                infoDiv.appendChild(titleDiv);
+
+                card.appendChild(imageDiv);
+                card.appendChild(infoDiv);
+                nodeDiv.appendChild(card);
+
+                nodeDiv.addEventListener('click', () => this.openModal(node));
+
+                this.container.appendChild(nodeDiv);
+                this.nodeElements[node.id] = nodeDiv;
+            }
+
+            openModal(node) {
+                document.getElementById('modalImage').src = node.img || DEFAULT_AVATAR;
+                document.getElementById('modalName').textContent = node.name;
+
+                const modalContent = document.getElementById('modalContent');
+                modalContent.innerHTML = '';
+
+                const fields = [
+                    { key: 'Title', label: 'Title', icon: 'briefcase' },
+                    { key: 'Phone', label: 'Phone', icon: 'phone' },
+                    { key: 'Email', label: 'Email', icon: 'envelope' },
+                    { key: 'Linkedin', label: 'LinkedIn', icon: 'linkedin' }
+                ];
+
+                fields.forEach(field => {
+                    if (node[field.key]) {
+                        const fieldDiv = document.createElement('div');
+                        fieldDiv.className = 'info-item';
+                        
+                        const label = document.createElement('div');
+                        label.className = 'info-label';
+                        label.innerHTML = '<i class="fas fa-' + field.icon + '"></i> ' + field.label;
+                        
+                        const value = document.createElement('div');
+                        value.className = 'info-value';
+                        
+                        if (field.key === 'email') {
+                            value.innerHTML = '<a href="mailto:' + node[field.key] + '">' + node[field.key] + '</a>';
+                        } else if (field.key === 'linkedin') {
+                            value.innerHTML = '<a href="' + node[field.key] + '" target="_blank">Ver Perfil</a>';
+                        } else {
+                            value.textContent = node[field.key];
+                        }
+                        
+                        fieldDiv.appendChild(label);
+                        fieldDiv.appendChild(value);
+                        modalContent.appendChild(fieldDiv);
+                    }
+                });
+
+                this.modalInstance.show();
+            }
+
+            adjustViewport() {
+                // Calcular dimensões totais
+                const allPositions = Object.values(this.positions);
+                if (allPositions.length === 0) return;
+
+                const minX = Math.min(...allPositions.map(p => p.x));
+                const maxX = Math.max(...allPositions.map(p => p.x + p.width));
+                const minY = Math.min(...allPositions.map(p => p.y));
+                const maxY = Math.max(...allPositions.map(p => p.y + p.height));
+
+                const contentWidth = maxX - minX;
+                const contentHeight = maxY - minY;
+
+                // Obter dimensões do container
+                const wrapper = this.container.parentElement;
+                const availableWidth = wrapper.clientWidth - 100;
+                const availableHeight = wrapper.clientHeight - 100;
+
+                // Calcular escala necessária
+                const scaleX = availableWidth / contentWidth;
+                const scaleY = availableHeight / contentHeight;
+                const scale = Math.min(scaleX, scaleY, 1);
+
+                // Aplicar escala
+                if (scale < 1) {
+                    this.container.style.transform = `scale(${scale})`;
+                } else {
+                    this.container.style.transform = 'scale(1)';
+                }
+
+                // Ajustar dimensões do container e centralizar conteúdo
+                const offsetX = -minX + 50; // Offset para começar do zero + padding
+                
+                this.container.style.width = (contentWidth + 100) + 'px';
+                this.container.style.height = (contentHeight + 100) + 'px';
+                
+                // Aplicar offset para centralizar o conteúdo
+                const allNodes = this.container.querySelectorAll('.org-node');
+                allNodes.forEach(node => {
+                    const currentLeft = parseFloat(node.style.left);
+                    node.style.left = (currentLeft + offsetX) + 'px';
+                });
+                
+                const svg = this.container.querySelector('svg');
+                if (svg) {
+                    const currentLeft = parseFloat(svg.style.left);
+                    svg.style.left = (currentLeft + offsetX) + 'px';
+                }
+            }
+        }
+
+        // ARRAY DE COLABORADORES - EDITE AQUI
+        const employees = [
+//NodeList
+        ];
+
+        new OrgChart('nodesContainer', employees);
+    </script>
+</body>
+</html>
