@@ -1,0 +1,97 @@
+PresentationCompresser
+
+PresentationCompresser é um aplicativo Windows desenvolvido para reduzir o tamanho de arquivos PowerPoint (.pptx) por meio da compressão automática de imagens e vídeos, gerando um novo arquivo otimizado sem alterar o original.
+
+🖥️ Plataforma
+
+Sistema Operacional: Windows 11
+
+Framework: .NET Framework 4
+
+Linguagem: C#
+
+Interface: Windows Forms (WinForms)
+
+🎯 Funcionalidades
+
+✅ Compressão automática de imagens e vídeos embutidos em arquivos PPTX
+
+✅ Geração de um novo arquivo compactado, preservando o original
+
+✅ Interface gráfica simples e objetiva
+
+✅ Processamento offline
+
+✅ Compactação de um arquivo por vez
+
+📂 Funcionamento
+
+O usuário seleciona um arquivo .pptx através de um botão na interface.
+
+O aplicativo processa o conteúdo do arquivo:
+
+Imagens
+
+Vídeos
+
+Ao final, é gerado um novo arquivo com o sufixo:
+
+nome_compressed.pptx
+
+
+O arquivo original não é modificado.
+
+⚙️ Configurações de Compressão
+
+A compressão não é configurável pelo usuário
+
+O aplicativo aplica automaticamente um perfil de compactação balanceado
+
+Não há seleção de qualidade, resolução ou nível de compressão
+
+(Essa decisão visa simplicidade e consistência no resultado final.)
+
+🚫 Limitações Conhecidas
+
+❌ Não suporta arrastar e soltar (Drag & Drop)
+
+❌ Não processa múltiplos arquivos simultaneamente
+
+❌ Não possui interface de linha de comando (CLI)
+
+❌ Arquivos protegidos por senha não são suportados
+
+📦 Dependências
+
+Não requer Microsoft PowerPoint instalado
+
+Não depende de conexão com a internet
+
+👥 Público-Alvo
+
+Uso corporativo
+
+Usuários que precisam reduzir rapidamente o tamanho de apresentações para:
+
+Envio por e-mail
+
+Compartilhamento em sistemas
+
+Arquivamento
+
+📄 Licença
+
+Este software é de uso proprietário.
+A redistribuição, modificação ou engenharia reversa não são permitidas sem autorização prévia.
+
+💡 Sugestões e Contato
+
+Sugestões de melhorias, feedback ou relatos de problema podem ser enviados para:
+
+📧 luiz@nvlan.com.br
+
+🛠️ Status do Projeto
+
+✅ Funcional
+
+🔧 Em evolução contínua
