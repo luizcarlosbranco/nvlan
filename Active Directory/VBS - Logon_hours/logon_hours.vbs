@@ -80,11 +80,7 @@ End Function
 '-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
 If isnull(objArgs(0)) or isempty(objArgs(0)) then
 	'Se tiver usuario logado
-	
-	'If NOT (UserIsLogged ) Then
 	If IsWorkstationLocked() Then
-
-
 		'Vamos dar alerta se na proxima hora vai acabar o horario de logon OU bloquear se já acabou o tempo
 		If Schedule(Now_Weekday,Now_Hour_UTC) = 0 Then
 			Set oShell = WScript.CreateObject ("WScript.Shell")
@@ -151,3 +147,4 @@ Function GetLogonHourBits(x)
 	GetLogonHourBits = arrBits
 
 End Function
+
