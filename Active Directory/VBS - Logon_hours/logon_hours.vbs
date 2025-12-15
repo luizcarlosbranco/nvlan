@@ -91,7 +91,7 @@ If isnull(objArgs(0)) or isempty(objArgs(0)) then
 			oShell.run "Rundll32.exe User32.dll,LockWorkStation"
 		ElseIf Schedule(Now_Weekday,NextHour_UTC_Hour) = 0 Then
 			dim answer
-			answer = MsgBox("Sua conta de rede ira bloquear as "& NextHour_Hour_TZ &" horas" & vbcrlf & "" & vbcrlf & "Se for preciso, entre em contato com o suporte",48,"Sistema CNT")
+			answer = MsgBox("Sua conta de rede ira bloquear as "& NextHour_Hour_TZ &" horas" & vbcrlf & "" & vbcrlf & "Se for preciso, entre em contato com o suporte",48,"User Monitor")
 		End If
 	End If
 Else
@@ -149,4 +149,5 @@ Function GetLogonHourBits(x)
 		End If
 	Next
 	GetLogonHourBits = arrBits
+
 End Function
