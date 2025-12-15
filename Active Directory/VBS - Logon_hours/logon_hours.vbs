@@ -25,8 +25,17 @@ End If
 
 arrLogonHours = objUser.Get("logonHours")
 
+' valida tamanho do atributo (21 bytes = 168 horas)
+If LenB(arrLogonHours) <> 21 Then
+    WScript.Quit
+End If
+
 Dim arrLogonHoursBytes(20)
 Dim Schedule(7,23)
+
+' cria o array com o tamanho exato do atributo
+ReDim arrLogonHoursBytes(LenB(arrLogonHours) - 1)
+
 For i = 1 To LenB(arrLogonHours)
      arrLogonHoursBytes(i-1) = AscB(MidB(arrLogonHours, i, 1))
 Next
@@ -80,22 +89,22 @@ End Function
 '-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
 If isnull(objArgs(0)) or isempty(objArgs(0)) then
 	'Se tiver usuario logado
-	If IsWorkstationLocked() Then
+	'If IsWorkstationLocked() Then
+	If Not IsWorkstationLocked() Then
 		'Vamos dar alerta se na proxima hora vai acabar o horario de logon OU bloquear se já acabou o tempo
 		If Schedule(Now_Weekday,Now_Hour_UTC) = 0 Then
 			Set oShell = WScript.CreateObject ("WScript.Shell")
 			oShell.run "Rundll32.exe User32.dll,LockWorkStation"
 		ElseIf Schedule(Now_Weekday,NextHour_UTC_Hour) = 0 Then
 			dim answer
-			answer = MsgBox("Sua conta de rede ira bloquear as "& NextHour_Hour_TZ &" horas" & vbcrlf & "" & vbcrlf & "Se for preciso, entre em contato com o suporte",48,"User Monitor")
+			answer = MsgBox("Sua conta de rede ira bloquear as "& NextHour_Hour_TZ &" horas" & vbcrlf & "" & vbcrlf & "Se for preciso, entre em contato com o suporte",48,"Logon User Monitor")
 		End If
 	End If
 Else
 	wscript.echo "DEBUG MODE"
 	wscript.echo ""
-	wscript.echo ""
 	wscript.echo "The dayweek is: "& Now_Weekday
-	wscript.echo "The time now is: "& This_Moment_UTC
+	wscript.echo "The date time (UTC) now is: "& This_Moment_UTC
 	wscript.echo ""
 	wscript.echo ""
 	Dim arrLogonHoursBits(167)
@@ -127,7 +136,8 @@ Else
 	'Vamos informar qual seria o resultado desse script
 	If Schedule(Now_Weekday,Now_Hour_UTC) = 0 Then
 		wscript.echo "Resultado: O Script iria BLOQUEAR o PC agora"
-	ElseIf Schedule(Now_Weekday,NextHour_UTC_Hour) = 0 Then
+	'ElseIf Schedule(Now_Weekday,NextHour_UTC_Hour) = 0 Then
+	ElseIf Schedule(NextHour_UTC_Weekday,NextHour_UTC_Hour) = 0 Then
 		wscript.echo "Resultado: O Script iria AVISAR que na proxima hora vai bloquear"
 	Else
 		wscript.echo "Resultado: O Script nao iria fazer NADA nesse momento"
@@ -145,6 +155,4 @@ Function GetLogonHourBits(x)
 		End If
 	Next
 	GetLogonHourBits = arrBits
-
 End Function
-
