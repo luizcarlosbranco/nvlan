@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+	<Fragment>
+		
+		<!-- Propriedades utilizadas na instalação -->
+		<Property Id="CLIENTDOMAIN" Secure="yes" />
+
+		<UI>
+
+			<Dialog Id="LicenseDlg" Width="370" Height="270" Title="[ProductName] Setup">
+
+				<Control Id="Banner" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner"/>
+				<Control Id="Title" Type="Text" X="15" Y="6" Width="340" Height="30" Transparent="yes" NoPrefix="yes" Text="Informe o nome do seu dominio"/>
+				<Control Id="Description" Type="Text" X="20" Y="60" Width="320" Height="20" Text="Digite abaixo o nome do seu dominio."/>
+				<Control Id="LicenseLabel" Type="Text" X="20" Y="100" Width="120" Height="15" Text="Nome do domínio:"/>
+				<Control Id="LicenseEdit" Type="Edit" Property="CLIENTDOMAIN" X="20" Y="118" Width="320" Height="18"/>
+				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="Voltar">
+					<Publish Event="NewDialog" Value="CNTWelcomeEulaDlg"> 	1 </Publish>
+				</Control>
+				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="Próximo">
+					<Publish Event="NewDialog" Value="VerifyReadyDlg"> 	CLIENTDOMAIN &lt;&gt; "" AND NOT CLIENTDOMAIN &gt;&lt; "@" </Publish>
+				</Control>
+
+				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancelar">
+					<Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+				</Control>
+
+			</Dialog>
+			
+		</UI>
+		
+    </Fragment>
+
+</Wix>

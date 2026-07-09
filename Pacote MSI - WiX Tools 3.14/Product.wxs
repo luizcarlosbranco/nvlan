@@ -1,0 +1,210 @@
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <Product
+      Id="*"
+      Name="CNT Client"
+      Language="1046"
+      Version="1.0.0.0"
+      Manufacturer="CNT"
+      UpgradeCode="3c060f44-0ca2-481c-99d5-d59958161799"
+	  Codepage="65001">
+
+    <Package
+        InstallerVersion="500"
+        Compressed="yes"
+        InstallScope="perUser" />
+
+	<!-- UI Interface -->
+
+    <WixVariable Id="WixUIBannerBmp" Value="Images\WixUIBanner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="Images\WixUIDialog.bmp" />
+	<WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+		
+    <UI>
+		<!--
+		<UIRef Id="WixUI_Minimal"/>	
+        <UIRef Id="WixUI_InstallDir"/>
+		<UIRef Id="WixUI_Advanced"/>
+		-->
+		<UIRef Id="CNTUI"/>
+	</UI>
+
+	<!-- ICON -->
+	<Icon Id="CNTClientIcon" SourceFile="Images\logo.ico" />
+	<Property Id="ARPPRODUCTICON" Value="CNTClientIcon" />
+
+    <MediaTemplate EmbedCab="yes"/>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+	
+		<!-- PARA PODER CRIAR ATALHO NA AREA DE TRABALHO-->
+		<Directory Id="DesktopFolder"/>
+
+		<Directory Id="LocalAppDataFolder">
+
+			<Directory Id="INSTALLFOLDER"
+					   Name="CNTClient">
+					   
+				<Component Id="MainFiles"
+					Guid="B7A65A31-4A6D-4E0C-9E7A-222222222222">
+
+					<!-- Arquivos -->
+
+					<File Id="PPTXCompresserExe" Source="..\Payload\PPTXCompresser.exe">
+						<Shortcut
+							Id="DesktopShortcut"
+							Directory="DesktopFolder"
+							Name="PPTX Compresser"
+							Description="PPTX Compresser"
+							WorkingDirectory="INSTALLFOLDER"
+							Advertise="no"/>
+					</File>
+			
+					<File Id="WallpaperClientExe" Source="..\Payload\WallpaperClient.exe" />
+
+					<File Id="QRCoderDll" Source="..\Payload\QRCoder.dll" />
+						  
+					<File Id="SMfOExe" Source="..\Payload\SMfO.exe" />
+
+					<File Id="OutlookAddinDll" Source="..\Payload\Outlook_Addin.dll" SelfRegCost="1" />
+
+					<!-- Atalhos -->
+					<!-- 	
+					<Shortcut
+						Id="DesktopShortcut"
+						Directory="DesktopFolder"
+						Name="PPTX Compresser"
+						Description="PPTX Compresser"
+						WorkingDirectory="INSTALLFOLDER"
+						Advertise="no"
+						Icon="CNTClientIcon"/>
+					-->
+					
+					<!-- Registro do aplicativo -->
+					<RegistryKey Root="HKCU" Key="Software\CNTClient">
+
+						<RegistryValue Name="Installed" Type="integer" Value="1" KeyPath="yes"/>
+
+					</RegistryKey>
+						
+					<!-- Registro COM -->
+					<RegistryKey Root="HKCU" Key="Software\Classes\CLSID\{A7B5E8C2-9D3F-4E6A-B1C4-2F8E9A7D6C5B}">
+						<RegistryValue Type="string" Value="COutlookAddin Class"/>
+					</RegistryKey>
+					
+					<!-- InprocServer32 -->
+					<RegistryKey Root="HKCU" Key="Software\Classes\CLSID\{A7B5E8C2-9D3F-4E6A-B1C4-2F8E9A7D6C5B}\InprocServer32">
+						<RegistryValue Type="string" Value="[INSTALLFOLDER]Outlook_Addin.dll"/>
+						<RegistryValue Name="ThreadingModel" Type="string" Value="Apartment"/>
+					</RegistryKey>
+
+					<!-- Outlook Add-In -->
+
+					<RegistryKey Root="HKCU" Key="Software\Classes\CLSID\{A7B5E8C2-9D3F-4E6A-B1C4-2F8E9A7D6C5B}\ProgID">
+						<RegistryValue Type="string" Value="CorporateBrandIdentity.OutlookAddin.1"/>
+					</RegistryKey>
+
+					<RegistryKey Root="HKCU" Key="Software\Classes\CLSID\{A7B5E8C2-9D3F-4E6A-B1C4-2F8E9A7D6C5B}\Programmable"/>
+
+					<RegistryKey Root="HKCU" Key="Software\Classes\CorporateBrandIdentity.OutlookAddin">
+						<RegistryValue Type="string" Value="COutlookAddin Class"/>
+					</RegistryKey>
+
+					<RegistryKey Root="HKCU" Key="Software\Classes\CorporateBrandIdentity.OutlookAddin\CLSID">
+						<RegistryValue Type="string" Value="{A7B5E8C2-9D3F-4E6A-B1C4-2F8E9A7D6C5B}"/>
+					</RegistryKey>
+
+					<!-- Versionado -->
+					<RegistryKey Root="HKCU" Key="Software\Classes\CorporateBrandIdentity.OutlookAddin.1">
+						<RegistryValue Type="string" Value="COutlookAddin Class"/>
+					</RegistryKey>
+
+					<RegistryKey Root="HKCU" Key="Software\Classes\CorporateBrandIdentity.OutlookAddin.1\CLSID">
+						<RegistryValue Type="string" Value="{A7B5E8C2-9D3F-4E6A-B1C4-2F8E9A7D6C5B}"/>
+					</RegistryKey>
+
+					<RegistryKey Root="HKCU" Key="Software\Microsoft\Office\Outlook\Addins\CorporateBrandIdentity.OutlookAddin.1">
+						<RegistryValue Name="FriendlyName" Type="string" Value="CNT - Outlook Add-in"/>
+						<RegistryValue Name="Description" Type="string" Value="Captura eventos do Outlook"/>
+						<RegistryValue Name="LoadBehavior" Type="integer" Value="3"/>
+						<RegistryValue Name="CommandLineSafe" Type="integer" Value="0" />
+					</RegistryKey>
+			
+					<!-- Classifications -->
+					<RegistryKey Root="HKCU" Key="Software\Microsoft\Office\Outlook\Addins\CorporateIdentity.OutlookAddin\Classifications">
+						<RegistryValue Name="Title" Type="string" Value="Classificação de Segurança" />
+						<RegistryValue Name="Text" Type="string" Value="Selecione o nível de classificação deste e-mail:" />
+					</RegistryKey>
+
+					<!-- 001 -->
+					<RegistryKey Root="HKCU" Key="Software\Microsoft\Office\Outlook\Addins\CorporateIdentity.OutlookAddin\Classifications\001">
+						<RegistryValue Name="Name" Type="string" Value="Publico" />
+						<RegistryValue Name="Subject" Type="string" Value="" />
+					</RegistryKey>
+
+					<!-- 002 -->
+					<RegistryKey Root="HKCU" Key="Software\Microsoft\Office\Outlook\Addins\CorporateIdentity.OutlookAddin\Classifications\002">
+						<RegistryValue Name="Name" Type="string" Value="Interno" />
+						<RegistryValue Name="Subject" Type="string" Value="[INT]" />
+						<RegistryValue Name="Body" Type="string" Value="Interno" />
+					</RegistryKey>
+					
+					<!-- 003 -->
+					<RegistryKey Root="HKCU" Key="Software\Microsoft\Office\Outlook\Addins\CorporateIdentity.OutlookAddin\Classifications\003">
+						<RegistryValue Name="Name" Type="string" Value="Confidencial" />
+						<RegistryValue Name="Subject" Type="string" Value="[CONFIDENCIAL]" />
+						<RegistryValue Name="Body" Type="string" Value="Confidencial" />
+					</RegistryKey>
+				
+					<!-- Limpeza na desinstalação -->
+					<RemoveFolder Id="RemoveInstallFolder"
+						Directory="INSTALLFOLDER"
+						On="uninstall"/>
+
+					<RemoveFile
+						Id="RemoveDesktopShortcut"
+						Name="PPTX Compresser.lnk"
+						Directory="DesktopFolder"
+						On="uninstall"/>
+
+				</Component>
+
+			</Directory>
+
+		</Directory>
+
+    </Directory>
+
+    <Feature Id="MainFeature"
+             Title="CNT Client"
+             Level="1">
+
+      <ComponentRef Id="MainFiles"/>
+	  
+
+    </Feature>
+
+	<!-- Criando uma Schedule Task -->
+	<CustomAction
+		Id="CreateScheduledTask"
+		Directory="TARGETDIR"
+		Execute="immediate"
+		ExeCommand='schtasks.exe /Create /F /TN "CNTClient - Wallpaper" /SC MINUTE /MO 15 /TR "\"[#WallpaperClientExe]\" --domain [CLIENTDOMAIN]"'
+		Return="check"/>
+
+	<CustomAction
+		Id="DeleteScheduledTask"
+		Directory="TARGETDIR"
+		Execute="deferred"
+		Impersonate="yes"
+		ExeCommand='schtasks.exe /Delete /TN "CNTClient - Wallpaper" /F'
+		Return="ignore"/>
+	
+	<InstallExecuteSequence>
+		<Custom Action="CreateScheduledTask" After="InstallFiles">NOT Installed</Custom>
+		<Custom Action="DeleteScheduledTask" Before="RemoveFiles">REMOVE="ALL"</Custom>
+	</InstallExecuteSequence>
+
+  </Product>
+
+</Wix>

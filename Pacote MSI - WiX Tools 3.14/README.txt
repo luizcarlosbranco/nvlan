@@ -1,0 +1,1 @@
+msiexec /i CNTClient.msi CLIENTDOMAIN=empresa.com.br /quiet
