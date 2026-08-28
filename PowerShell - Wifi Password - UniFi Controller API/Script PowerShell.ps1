@@ -90,7 +90,7 @@ $BodyAlteracao = @{
 $Alteracao = Invoke-RestMethod -Uri "$Controller/api/s/$($WifiEncontrado.SiteNome)/rest/wlanconf/$($WifiEncontrado.WifiID)" -Method PUT -Body $BodyAlteracao -ContentType "application/json" -WebSession $Session
 
 if ($Alteracao.meta.rc -eq "ok") {
-    New-QRCodeText -Text "WIFI:T:WPA;S:$NetworkSSID;P:$NetworkPass;;" -OutPath $QrPath -Width 10
+    New-QRCodeText -Text "WIFI:T:WPA;S:$NetworkSSID;P:$NetworkPass;;" -OutPath $QrPath -Width 10 -DarkColorRgba @(0, 54, 110) -LightColorRgba @(255, 255, 255)
 
     (Get-Content $templatePath -Raw) -replace "NomeDaRede", "$NetworkSSID" -replace "SenhaDaRede", "$NetworkPass" -replace "logo.png", "$SourceFolder\logo.png" | Set-Content $HTMLPath
 
