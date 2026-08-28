@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wallpaper</title>
+
+<style>
+*{margin:0}
+
+body{
+  overflow:hidden;
+  font:16px Arial;
+  color:#032f5d;
+  background:#fff;
+}
+
+.wallpaper{
+  height:100vh;
+  position:relative;
+  background:#edf3f7;
+}
+
+.blue{
+  position:absolute;
+  width:50%;
+  height:130%;
+  right:-10%;
+  top:-15%;
+  background:#063f78;
+  transform:rotate(7deg);
+}
+
+.content{
+  position:absolute;
+  top:50%;
+  left:7%;
+  transform:translateY(-50%);
+}
+
+p{font-size:24px;}
+
+h1{
+  margin:15px 0;
+  font-size:5vw;
+  line-height:1;
+}
+
+span{color:#063f78}
+
+.qr{
+  position:absolute;
+  top:50%;
+  right:10%;
+  width:25%;
+  transform:translateY(-50%);
+  text-align:center;
+  color:#fff;
+}
+
+.qr img{width:100%;}
+
+</style>
+</head>
+
+<body>
+<div class="wallpaper">
+  <div class="blue"></div>
+
+  <main class="content">
+    <p>Tecnologia • Conexão • Inovação</p>
+    <h1>O futuro,<br><span>em constante<br>evolução.</span></h1>
+    <p>Inovação e tecnologia para conectar pessoas.</p>
+  </main>
+
+  <section class="qr">
+    <h1>Wi-Fi</h1>
+    <img src="WiFiQR.png" alt="QR Code">
+    <p><br>Rede Wifi: NomeDaRede<br><br>Senha: SenhaDaRede</p>
+  </section>
+</div>
+</body>
+</html>
